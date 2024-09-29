@@ -168,7 +168,7 @@ class RatingFragment extends StatelessWidget {
                                     96)),
                           ),
                           Expanded(
-                            flex: 2,
+                            flex: 4,
                             child: CoherentSliverCompatWidget((ctx,
                                     sliverCompat) =>
                                 CustomScrollView(
@@ -188,12 +188,53 @@ class RatingFragment extends StatelessWidget {
                                           ),
                                         )),
                                     SliverFillRemaining(
-                                      child: CoherentSliverCompatWidget(
-                                          (ctx, sliverCompat) => buildMenuList(
-                                              sliverCompat
-                                                  .generateScrollController(
-                                                      tag: const Key("3-1")),
-                                              32)),
+                                      child: Row(
+                                        children: [
+                                          const FittedBox(
+                                            child: SizedBox(
+                                              height: 320,
+                                              child: Text("CommonView"),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            flex: 4,
+                                            child: CoherentSliverCompatWidget(
+                                                (ctx, sliverCompat) =>
+                                                    CustomScrollView(
+                                                      controller: sliverCompat
+                                                          .generateScrollController(
+                                                              tag: Key("4")),
+                                                      slivers: [
+                                                        SliverPersistentHeader(
+                                                            pinned: true,
+                                                            delegate:
+                                                                CustomSliverPersistentHeaderDelegate(
+                                                              maxExtent: 200,
+                                                              minExtent:
+                                                                  MediaQuery.of(
+                                                                          context)
+                                                                      .viewPadding
+                                                                      .top,
+                                                              child: AppBar(
+                                                                title: const Text(
+                                                                    "SliverAppBar"),
+                                                              ),
+                                                            )),
+                                                        CoherentSliverCompatWidget(
+                                                          (ctx, sliverCompat) =>
+                                                              SliverFillRemaining(
+                                                            child: buildMenuList(
+                                                                sliverCompat.generateScrollController(
+                                                                    tag: const Key(
+                                                                        "4-1")),
+                                                                66),
+                                                          ),
+                                                        )
+                                                      ],
+                                                    )),
+                                          ),
+                                        ],
+                                      ),
                                     )
                                   ],
                                 )),
