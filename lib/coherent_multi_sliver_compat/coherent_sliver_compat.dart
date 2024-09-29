@@ -74,6 +74,10 @@ class CoherentSliverCompat {
 
   double onScrollToTop(
       CoherentSliverCompatScrollPosition? submitter, double delta) {
+    if (delta == 0) {
+      return 0;
+    }
+
     /// 向外传递
     double remaining = delta;
     remaining = CoherentSliverCompatDelegate.of(buildContext)
@@ -91,9 +95,6 @@ class CoherentSliverCompat {
     }
 
     print('($debugKey)ToTop  pha2: 剩余:$remaining');
-    if (remaining == 0) {
-      return 0;
-    }
 
     return remaining;
   }
@@ -102,24 +103,26 @@ class CoherentSliverCompat {
       CoherentSliverCompatScrollPosition? submitter, double delta) {
     double remaining = delta;
 
-    /// 向外传递
-    remaining = CoherentSliverCompatDelegate.of(buildContext)
-            ?.onChildrenSubmit(delta) ??
-        remaining;
     if (remaining == 0) {
-      return 0;
+      return remaining;
     }
-    print('($debugKey)ToBottom pha1: 剩余:$remaining');
 
     /// 内部消化
     if (_scrollController != null) {
       remaining = (_scrollController!.position as CoherentMajorScrollPosition)
           .applyClampedDragUpdate(remaining);
     }
-    print('($debugKey)ToBottom pha2: 剩余:$remaining');
+    print('($debugKey)ToBottom pha1: 剩余:$remaining');
+
     if (remaining == 0) {
       return 0;
     }
+
+    /// 向外传递
+    remaining = CoherentSliverCompatDelegate.of(buildContext)
+            ?.onChildrenSubmit(remaining) ?? // 如果这里换成delta就可以实现多级同步滚动
+        remaining;
+    print('($debugKey)ToBottom pha2: 剩余:$remaining');
 
     return remaining;
   }
