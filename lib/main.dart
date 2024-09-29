@@ -98,13 +98,13 @@ class _SliverCompatBizWidgetState extends State<SliverCompatBizWidget>
   List<Tab> _implementTabs() {
     return [
       const Tab(
-        text: "商品",
+        text: "同级嵌套滚动",
       ),
       const Tab(
-        text: "评价",
+        text: "多级嵌套滚动",
       ),
       const Tab(
-        text: "商家",
+        text: "---",
       ),
     ];
   }
@@ -117,7 +117,7 @@ class _SliverCompatBizWidgetState extends State<SliverCompatBizWidget>
               child: Padding(
                 padding: EdgeInsets.all(16),
                 child: FittedBox(
-                  child: Text("广告视图"),
+                  child: Text("其他视图"),
                 ),
               ),
             ),
