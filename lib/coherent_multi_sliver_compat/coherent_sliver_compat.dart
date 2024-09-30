@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_scroll_controller.dart';
-import 'package:free_scroll_compat/multi_sliver_compat/multi_sliver_scroll_controller.dart';
 
 typedef CoherentSliverCompatBuilder = Function(
     BuildContext, CoherentSliverCompat);
@@ -57,7 +56,7 @@ class CoherentSliverCompat {
       return _scrollController!;
     }
     CoherentSliverCompatScrollController newController =
-        CoherentSliverCompatScrollController.minor(tag, this);
+        CoherentSliverCompatScrollController.create(tag, this);
     _scrollController = newController;
     return newController;
   }
@@ -83,14 +82,16 @@ class CoherentSliverCompat {
     remaining = CoherentSliverCompatDelegate.of(buildContext)
             ?.onChildrenSubmit(delta) ??
         remaining;
+
     if (remaining == 0) {
       return 0;
     }
+
     print('($debugKey)ToTop  pha1: 剩余:$remaining');
 
     // 结点内部消化
     if (_scrollController != null) {
-      remaining = (_scrollController!.position as CoherentMajorScrollPosition)
+      remaining = (_scrollController!.position as CoherentSliverCompatScrollPosition)
           .applyClampedDragUpdate(remaining);
     }
 
@@ -109,7 +110,7 @@ class CoherentSliverCompat {
 
     /// 内部消化
     if (_scrollController != null) {
-      remaining = (_scrollController!.position as CoherentMajorScrollPosition)
+      remaining = (_scrollController!.position as CoherentSliverCompatScrollPosition)
           .applyClampedDragUpdate(remaining);
     }
     print('($debugKey)ToBottom pha1: 剩余:$remaining');

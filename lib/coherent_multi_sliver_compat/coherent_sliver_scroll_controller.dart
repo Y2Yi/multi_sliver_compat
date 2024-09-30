@@ -11,25 +11,15 @@ import 'dart:math';
 class CoherentSliverCompatScrollController extends ScrollController {
   Key? debugKey;
   CoherentSliverCompat sliverCompat;
-  late bool isMajorScrollController;
 
-  CoherentSliverCompatScrollController._(this.sliverCompat,
-      {this.debugKey});
+  CoherentSliverCompatScrollController._(this.sliverCompat, {this.debugKey});
 
-  CoherentSliverCompatScrollController.major(
-      this.debugKey, this.sliverCompat) {
-    isMajorScrollController = true;
-  }
-
-  CoherentSliverCompatScrollController.minor(
-      this.debugKey, this.sliverCompat) {
-    isMajorScrollController = false;
-  }
+  CoherentSliverCompatScrollController.create(this.debugKey, this.sliverCompat);
 
   @override
   ScrollPosition createScrollPosition(ScrollPhysics physics,
       ScrollContext context, ScrollPosition? oldPosition) {
-    return CoherentMajorScrollPosition(sliverCompat,
+    return CoherentSliverCompatScrollPosition(sliverCompat,
         physics: const ScrollPhysics(), context: context, debugKey: debugKey);
   }
 }
@@ -74,10 +64,4 @@ class CoherentSliverCompatScrollPosition
     }
     return delta + offset;
   }
-}
-
-class CoherentMajorScrollPosition
-    extends CoherentSliverCompatScrollPosition {
-  CoherentMajorScrollPosition(super.sliverCompat,
-      {required super.physics, required super.context, super.debugKey});
 }
