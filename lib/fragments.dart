@@ -19,7 +19,7 @@ Widget buildMenu(double h) {
   );
 }
 
-Widget buildMenuList(ScrollController scrollController, double h,
+Widget buildMenuList(ScrollController? scrollController, double h,
     {int count = 32}) {
   if (count == 0) {
     return const SizedBox.shrink();
@@ -245,5 +245,22 @@ class RatingFragment extends StatelessWidget {
             ),
           ],
         ));
+  }
+}
+
+class NestedScrollFragment extends StatelessWidget {
+  const NestedScrollFragment({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return NestedScrollView(
+        headerSliverBuilder: (a, b) {
+          return [
+            const SliverAppBar(
+              title: Text("hello"),
+            )
+          ];
+        },
+        body: buildMenuList(null, 64));
   }
 }

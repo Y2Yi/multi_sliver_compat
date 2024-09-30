@@ -104,7 +104,7 @@ class _SliverCompatBizWidgetState extends State<SliverCompatBizWidget>
         text: "多级嵌套滚动",
       ),
       const Tab(
-        text: "---",
+        text: "NestedScrollView",
       ),
     ];
   }
@@ -129,5 +129,5 @@ class _SliverCompatBizWidgetState extends State<SliverCompatBizWidget>
 
   _generateRatingPage() => RatingFragment();
 
-  _generateStorePage() => StoreFragment();
+  _generateStorePage() => NestedScrollFragment();
 }
