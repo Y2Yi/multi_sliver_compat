@@ -256,9 +256,15 @@ class NestedScrollFragment extends StatelessWidget {
     return NestedScrollView(
         headerSliverBuilder: (a, b) {
           return [
-            const SliverAppBar(
-              title: Text("hello"),
-            )
+            SliverPersistentHeader(
+                pinned: true,
+                delegate: CustomSliverPersistentHeaderDelegate(
+                  maxExtent: 200,
+                  minExtent: MediaQuery.of(context).viewPadding.top,
+                  child: AppBar(
+                    title: const Text("SliverAppBar"),
+                  ),
+                )),
           ];
         },
         body: buildMenuList(null, 64));
