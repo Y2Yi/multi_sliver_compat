@@ -185,7 +185,7 @@ class RatingFragment extends StatelessWidget {
                                         pinned: true,
                                         delegate:
                                             CustomSliverPersistentHeaderDelegate(
-                                          maxExtent: 200,
+                                          maxExtent: 320,
                                           minExtent: MediaQuery.of(context)
                                               .viewPadding
                                               .top,
