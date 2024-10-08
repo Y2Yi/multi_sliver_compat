@@ -2,6 +2,7 @@ import 'dart:collection';
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_delegate_widget.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_scroll_controller.dart';
@@ -99,5 +100,48 @@ class CoherentSliverCompat {
   double onChildrenSubmit(double delta) {
     print('($debugKey)Receiver from Another layer 组件间剩余:$delta');
     return submitUserOffset(null, delta);
+  }
+
+  double submitAnimatedValue(double value) {
+    if (value.abs() < precisionErrorTolerance) {
+      return value;
+    }
+    // if (value < 0) {
+    //   // to Top
+    //   return _submitAnimatedValueToTop(value);
+    // } else {
+    //   // to bottom
+    //   return _submitAnimatedValueToBottom(value);
+    // }
+    return _submitAnimatedValueToTop(value);
+  }
+
+  // // 祖先SliverCompat将无法准确获取到需要分发的下一个节点是哪一个
+  // double _submitAnimatedValueToBottom(double value) {
+  //   return (_scrollController!.position as CoherentSliverCompatScrollPosition)
+  //       .applyClampedDragUpdate(value);
+  // }
+
+  double _submitAnimatedValueToTop(double value) {
+    double remaining = value;
+
+    if (remaining.abs() > 0) {
+      // 向上提交
+      remaining = CoherentSliverCompatDelegate.of(buildContext)
+              ?.submitAnimatedValue(remaining) ??
+          remaining;
+    }
+    if (remaining.abs() < precisionErrorTolerance) {
+      return remaining;
+    }
+    print(
+        "(FlutterSourceCode)[coherent_sliver_compat.dart]->applyMoveTo layerConsume:${value - remaining}");
+    remaining =
+        (_scrollController!.position as CoherentSliverCompatScrollPosition)
+            .applyClampedDragUpdate(remaining);
+
+    print(
+        "(FlutterSourceCode)[coherent_sliver_compat.dart]->layer($debugKey) remaining:${remaining}");
+    return remaining;
   }
 }

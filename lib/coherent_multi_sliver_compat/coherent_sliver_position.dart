@@ -58,20 +58,47 @@ class CoherentSliverCompatScrollPosition
 
   @override
   void goBallistic(double velocity) {
-    print(
-        "(FlutterSourceCode)[coherent_sliver_position.dart]->goBallistic:${velocity}");
     assert(hasPixels);
     final Simulation? simulation =
         physics.createBallisticSimulation(this, velocity);
     if (simulation != null) {
-      beginActivity(BallisticScrollActivity(
-        this,
-        simulation,
-        context.vsync,
-        activity?.shouldIgnorePointer ?? true,
-      ));
+      print(
+          "(FlutterSourceCode)[coherent_sliver_position.dart]->goBallistic simulation is not null:${simulation.runtimeType}");
+      beginActivity(createBallisticScrollActivity(simulation));
     } else {
       goIdle();
     }
+  }
+
+  ScrollActivity createBallisticScrollActivity(Simulation simulation) {
+    return CoherentBallisticScrollActivity(sliverCompat, this, simulation,
+        context.vsync, activity?.shouldIgnorePointer ?? true);
+  }
+
+  @override
+  double applyBoundaryConditions(double value) {
+    return super.applyBoundaryConditions(value);
+  }
+}
+
+class CoherentBallisticScrollActivity extends BallisticScrollActivity {
+  CoherentBallisticScrollActivity(this.sliverCompat, super.delegate,
+      super.simulation, super.vsync, super.shouldIgnorePointer);
+
+  CoherentSliverCompat sliverCompat;
+
+  @override
+  bool applyMoveTo(double value) {
+    print(
+        "(FlutterSourceCode)[coherent_sliver_position.dart]->applyMoveTo $value");
+
+    var remaining = sliverCompat.submitAnimatedValue(value);
+
+    print(
+        "(FlutterSourceCode)[coherent_sliver_position.dart]->applyMoveTo remaining $remaining");
+    if (remaining == value) {
+      return super.applyMoveTo(value);
+    }
+    return remaining.abs() < precisionErrorTolerance;
   }
 }

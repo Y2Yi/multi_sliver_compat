@@ -1,12 +1,8 @@
-import 'dart:collection';
-import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_compat.dart';
-import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_scroll_controller.dart';
 
-import 'coherent_sliver_position.dart';
 
 typedef CoherentSliverCompatBuilder = Function(
     BuildContext, CoherentSliverCompat);
