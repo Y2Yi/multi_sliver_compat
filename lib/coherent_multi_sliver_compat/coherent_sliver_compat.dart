@@ -14,6 +14,8 @@ class CoherentSliverCompat {
   BuildContext buildContext;
   Key? debugKey;
 
+  Key? get effectiveDebugKey => debugKey ?? _scrollController?.debugKey;
+
   CoherentSliverCompat(this.buildContext, {this.debugKey});
 
   CoherentSliverCompatScrollController? _scrollController;
@@ -54,7 +56,7 @@ class CoherentSliverCompat {
       return 0;
     }
 
-    print('($debugKey)ToTop  pha1: 剩余:$remaining');
+    print('($effectiveDebugKey)ToTop  pha1: 剩余:$remaining');
 
     // 结点内部消化
     if (_scrollController != null) {
@@ -63,7 +65,7 @@ class CoherentSliverCompat {
               .applyClampedDragUpdate(remaining);
     }
 
-    print('($debugKey)ToTop  pha2: 剩余:$remaining');
+    print('($effectiveDebugKey)ToTop  pha2: 剩余:$remaining');
 
     return remaining;
   }
@@ -82,7 +84,7 @@ class CoherentSliverCompat {
           (_scrollController!.position as CoherentSliverCompatScrollPosition)
               .applyClampedDragUpdate(remaining);
     }
-    print('($debugKey)ToBottom pha1: 剩余:$remaining');
+    print('($effectiveDebugKey)ToBottom pha1: 剩余:$remaining');
 
     if (remaining == 0) {
       return 0;
@@ -92,13 +94,13 @@ class CoherentSliverCompat {
     remaining = CoherentSliverCompatDelegate.of(buildContext)
             ?.onChildrenSubmit(remaining) ?? // 如果这里换成delta就可以实现多级同步滚动
         remaining;
-    print('($debugKey)ToBottom pha2: 剩余:$remaining');
+    print('($effectiveDebugKey)ToBottom pha2: 剩余:$remaining');
 
     return remaining;
   }
 
   double onChildrenSubmit(double delta) {
-    print('($debugKey)Receiver from Another layer 组件间剩余:$delta');
+    print('($effectiveDebugKey)Receiver from Another layer 组件间剩余:$delta');
     return submitUserOffset(null, delta);
   }
 
@@ -123,6 +125,8 @@ class CoherentSliverCompat {
   // }
 
   double _submitAnimatedValueToTop(double value) {
+    print(
+        "(FlutterSourceCode)[coherent_sliver_compat.dart]->_submitAnimatedValueToTop layer receive($effectiveDebugKey):${value}");
     double remaining = value;
 
     if (remaining.abs() > 0) {
@@ -134,14 +138,12 @@ class CoherentSliverCompat {
     if (remaining.abs() < precisionErrorTolerance) {
       return remaining;
     }
-    print(
-        "(FlutterSourceCode)[coherent_sliver_compat.dart]->applyMoveTo layerConsume:${value - remaining}");
     remaining =
         (_scrollController!.position as CoherentSliverCompatScrollPosition)
             .applyClampedDragUpdate(remaining);
 
     print(
-        "(FlutterSourceCode)[coherent_sliver_compat.dart]->layer($debugKey) remaining:${remaining}");
+        "(FlutterSourceCode)[coherent_sliver_compat.dart]->_submitAnimatedValueToTop layer($effectiveDebugKey) remain:${remaining}");
     return remaining;
   }
 }

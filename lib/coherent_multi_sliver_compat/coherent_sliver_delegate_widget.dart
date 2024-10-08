@@ -1,8 +1,6 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_compat.dart';
-
 
 typedef CoherentSliverCompatBuilder = Function(
     BuildContext, CoherentSliverCompat);

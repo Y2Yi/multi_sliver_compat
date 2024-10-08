@@ -51,14 +51,16 @@ class CoherentSliverCompatScrollPosition
       forcePixels(actualNewPixels);
       didUpdateScrollPositionBy(offset);
     }
-    print(
-        "(FlutterSourceCode)[coherent_sliver_position.dart]->$debugKey 剩余滚动量:${delta + offset}");
     return delta + offset;
   }
 
   @override
   void goBallistic(double velocity) {
     assert(hasPixels);
+    if (velocity == 0) {
+      goIdle();
+      return;
+    }
     final Simulation? simulation =
         physics.createBallisticSimulation(this, velocity);
     if (simulation != null) {
@@ -90,15 +92,29 @@ class CoherentBallisticScrollActivity extends BallisticScrollActivity {
   @override
   bool applyMoveTo(double value) {
     print(
-        "(FlutterSourceCode)[coherent_sliver_position.dart]->applyMoveTo $value");
+        "(FlutterSourceCode)[coherent_sliver_position.dart] ------------------- ballistic tick $value");
 
-    var remaining = sliverCompat.submitAnimatedValue(value);
+    var remaining = sliverCompat.submitAnimatedValue(-value);
 
     print(
         "(FlutterSourceCode)[coherent_sliver_position.dart]->applyMoveTo remaining $remaining");
-    if (remaining == value) {
+    if (remaining.abs() == value) {
       return super.applyMoveTo(value);
     }
     return remaining.abs() < precisionErrorTolerance;
+  }
+
+  @override
+  void resetActivity() {
+    print(
+        "(FlutterSourceCode)[coherent_sliver_position.dart]-> ScrollActivity(${this.hashCode}) reset!");
+    super.resetActivity();
+  }
+
+  @override
+  void dispose() {
+    print(
+        "(FlutterSourceCode)[coherent_sliver_position.dart]->ScrollActivity(${this.hashCode} dispose!");
+    super.dispose();
   }
 }
