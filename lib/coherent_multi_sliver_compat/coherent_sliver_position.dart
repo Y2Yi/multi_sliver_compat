@@ -55,4 +55,23 @@ class CoherentSliverCompatScrollPosition
         "(FlutterSourceCode)[coherent_sliver_position.dart]->$debugKey 剩余滚动量:${delta + offset}");
     return delta + offset;
   }
+
+  @override
+  void goBallistic(double velocity) {
+    print(
+        "(FlutterSourceCode)[coherent_sliver_position.dart]->goBallistic:${velocity}");
+    assert(hasPixels);
+    final Simulation? simulation =
+        physics.createBallisticSimulation(this, velocity);
+    if (simulation != null) {
+      beginActivity(BallisticScrollActivity(
+        this,
+        simulation,
+        context.vsync,
+        activity?.shouldIgnorePointer ?? true,
+      ));
+    } else {
+      goIdle();
+    }
+  }
 }

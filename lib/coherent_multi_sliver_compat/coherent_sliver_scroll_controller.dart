@@ -22,6 +22,6 @@ class CoherentSliverCompatScrollController extends ScrollController {
   ScrollPosition createScrollPosition(ScrollPhysics physics,
       ScrollContext context, ScrollPosition? oldPosition) {
     return CoherentSliverCompatScrollPosition(sliverCompat,
-        physics: const ScrollPhysics(), context: context, debugKey: debugKey);
+        physics: physics, context: context, debugKey: debugKey);
   }
 }
