@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_compat.dart';
+import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_delegate_widget.dart';
 import 'package:free_scroll_compat/multi_sliver_compat/sliver_compat.dart';
 import 'package:free_scroll_compat/sliver_persistent_header_delegate.dart';
 

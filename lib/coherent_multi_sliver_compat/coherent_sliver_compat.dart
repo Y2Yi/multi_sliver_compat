@@ -3,44 +3,10 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_delegate_widget.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_scroll_controller.dart';
 
-typedef CoherentSliverCompatBuilder = Function(
-    BuildContext, CoherentSliverCompat);
-
-class CoherentSliverCompatWidget extends StatefulWidget {
-  final CoherentSliverCompatBuilder childBuilder;
-  final Key? debugKey;
-
-  const CoherentSliverCompatWidget(this.childBuilder,
-      {super.key, this.debugKey});
-
-  @override
-  State<CoherentSliverCompatWidget> createState() =>
-      _CoherentSliverCompatWidgetState();
-}
-
-typedef CoherentSliverCompatDelegate = _CoherentSliverCompatWidgetState;
-
-class _CoherentSliverCompatWidgetState
-    extends State<CoherentSliverCompatWidget> {
-  late CoherentSliverCompat _sliverCompat;
-
-  @override
-  void initState() {
-    super.initState();
-    _sliverCompat = CoherentSliverCompat(context, debugKey: widget.debugKey);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return widget.childBuilder(context, _sliverCompat);
-  }
-
-  static CoherentSliverCompat? of(BuildContext context) => context
-      .findAncestorStateOfType<CoherentSliverCompatDelegate>()
-      ?._sliverCompat;
-}
+import 'coherent_sliver_position.dart';
 
 /// 这个CoherentSliverCompat理应是隔离的，每个层级的每个结点都有个自己的CoherentSliverCompat；
 class CoherentSliverCompat {
@@ -91,8 +57,9 @@ class CoherentSliverCompat {
 
     // 结点内部消化
     if (_scrollController != null) {
-      remaining = (_scrollController!.position as CoherentSliverCompatScrollPosition)
-          .applyClampedDragUpdate(remaining);
+      remaining =
+          (_scrollController!.position as CoherentSliverCompatScrollPosition)
+              .applyClampedDragUpdate(remaining);
     }
 
     print('($debugKey)ToTop  pha2: 剩余:$remaining');
@@ -110,8 +77,9 @@ class CoherentSliverCompat {
 
     /// 内部消化
     if (_scrollController != null) {
-      remaining = (_scrollController!.position as CoherentSliverCompatScrollPosition)
-          .applyClampedDragUpdate(remaining);
+      remaining =
+          (_scrollController!.position as CoherentSliverCompatScrollPosition)
+              .applyClampedDragUpdate(remaining);
     }
     print('($debugKey)ToBottom pha1: 剩余:$remaining');
 
