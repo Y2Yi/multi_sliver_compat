@@ -16,7 +16,16 @@ class CoherentSliverCompatScrollPosition
   @override
   void applyUserOffset(double delta) {
     print("$debugKey notifyScroll");
-    sliverCompat.submitUserOffset(this, delta);
+    double remaining = sliverCompat.submitUserOffset(this, delta);
+
+    /// 剩余滚动量
+    if (remaining < precisionErrorTolerance) {
+      return;
+    }
+
+    /// 该滚动量应该造成视图自身的弹性滚动
+    print(
+        "(FlutterSourceCode)[coherent_sliver_position.dart]->$debugKey 盈余滚动量:$remaining");
   }
 
   /// 食用滚动量，然后返回未吃完的滚动量
@@ -42,6 +51,8 @@ class CoherentSliverCompatScrollPosition
       forcePixels(actualNewPixels);
       didUpdateScrollPositionBy(offset);
     }
+    print(
+        "(FlutterSourceCode)[coherent_sliver_position.dart]->$debugKey 剩余滚动量:${delta + offset}");
     return delta + offset;
   }
 }
