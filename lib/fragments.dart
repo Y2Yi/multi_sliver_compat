@@ -16,7 +16,12 @@ Widget buildMenu(double h) {
           Random().nextInt(255)),
     ),
     alignment: Alignment.center,
-    child: Text("${Random().nextInt(255)}"),
+    child: Builder(builder: (context) {
+      return Text(
+          "${Random().nextInt(255)},"
+              "position:${Scrollable.of(context).position.hashCode},"
+              "${Scrollable.of(context).position.context}");
+    }),
   );
 }
 
@@ -268,6 +273,17 @@ class NestedScrollFragment extends StatelessWidget {
                 )),
           ];
         },
-        body: buildMenuList(null, 64));
+        body: Row(
+          children: [
+            Expanded(
+              flex: 1,
+              child: buildMenuList(null, 64),
+            ),
+            Expanded(
+              flex: 2,
+              child: buildMenuList(null, 128),
+            )
+          ],
+        ));
   }
 }
