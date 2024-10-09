@@ -89,6 +89,7 @@ class CoherentBallisticScrollActivity extends BallisticScrollActivity {
 
   CoherentSliverCompat sliverCompat;
 
+
   @override
   bool applyMoveTo(double value) {
     print(
@@ -99,6 +100,8 @@ class CoherentBallisticScrollActivity extends BallisticScrollActivity {
     print(
         "(FlutterSourceCode)[coherent_sliver_position.dart]->applyMoveTo remaining $remaining");
     if (remaining.abs() == value) {
+      print(
+          "(FlutterSourceCode)[coherent_sliver_position.dart]->applyMoveTo full consume");
       return super.applyMoveTo(value);
     }
     return remaining.abs() < precisionErrorTolerance;

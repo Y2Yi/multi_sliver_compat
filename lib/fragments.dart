@@ -17,10 +17,9 @@ Widget buildMenu(double h) {
     ),
     alignment: Alignment.center,
     child: Builder(builder: (context) {
-      return Text(
-          "${Random().nextInt(255)},"
-              "position:${Scrollable.of(context).position.hashCode},"
-              "${Scrollable.of(context).position.context}");
+      return Text("${Random().nextInt(255)},"
+          "position:${Scrollable.of(context).position.hashCode},"
+          "${Scrollable.of(context).position.context}");
     }),
   );
 }
@@ -158,36 +157,33 @@ class RatingFragment extends StatelessWidget {
                 children: [
                   Expanded(
                     flex: 1,
-                    child: CoherentSliverCompatWidget(
-                            (ctx, sliverCompat) => buildMenuList(
+                    child: CoherentSliverCompatWidget((ctx, sliverCompat) =>
+                        buildMenuList(
                             sliverCompat.generateScrollController(
                                 tag: const Key("1-1")),
                             64)),
                   ),
                   Expanded(
                     flex: 1,
-                    child: CoherentSliverCompatWidget(
-                            (ctx, sliverCompat) => buildMenuList(
+                    child: CoherentSliverCompatWidget((ctx, sliverCompat) =>
+                        buildMenuList(
                             sliverCompat.generateScrollController(
                                 tag: const Key("1-2")),
                             96)),
                   ),
                   Expanded(
                     flex: 4,
-                    child: CoherentSliverCompatWidget((ctx,
-                        sliverCompat) =>
+                    child: CoherentSliverCompatWidget((ctx, sliverCompat) =>
                         CustomScrollView(
-                          controller: sliverCompat
-                              .generateScrollController(tag: Key("2")),
+                          controller: sliverCompat.generateScrollController(
+                              tag: Key("2")),
                           slivers: [
                             SliverPersistentHeader(
                                 pinned: true,
-                                delegate:
-                                CustomSliverPersistentHeaderDelegate(
+                                delegate: CustomSliverPersistentHeaderDelegate(
                                   maxExtent: 200,
-                                  minExtent: MediaQuery.of(context)
-                                      .viewPadding
-                                      .top,
+                                  minExtent:
+                                      MediaQuery.of(context).viewPadding.top,
                                   child: AppBar(
                                     title: const Text("SliverAppBar"),
                                   ),
@@ -204,36 +200,41 @@ class RatingFragment extends StatelessWidget {
                                   Expanded(
                                     flex: 4,
                                     child: CoherentSliverCompatWidget(
-                                            (ctx, sliverCompat) =>
-                                            CustomScrollView(
+                                        (ctx, sliverCompat) => CustomScrollView(
                                               controller: sliverCompat
                                                   .generateScrollController(
-                                                  tag: Key("3")),
+                                                      tag: Key("3")),
                                               slivers: [
                                                 SliverPersistentHeader(
                                                     pinned: true,
                                                     delegate:
-                                                    CustomSliverPersistentHeaderDelegate(
+                                                        CustomSliverPersistentHeaderDelegate(
                                                       maxExtent: 300,
                                                       minExtent:
-                                                      MediaQuery.of(
-                                                          context)
-                                                          .viewPadding
-                                                          .top,
-                                                      child: AppBar(
-                                                        title: const Text(
-                                                            "SliverAppBar"),
+                                                          MediaQuery.of(context)
+                                                              .viewPadding
+                                                              .top,
+                                                      child: LayoutBuilder(
+                                                        builder:
+                                                            (ctx, constraint) {
+                                                          print(
+                                                              "(FlutterSourceCode)[fragments.dart]->${constraint.maxHeight}");
+                                                          return AppBar(
+                                                              title: Text(
+                                                                  "${constraint.maxHeight}"));
+                                                        },
                                                       ),
                                                     )),
                                                 CoherentSliverCompatWidget(
-                                                      (ctx, sliverCompat) =>
+                                                  (ctx, sliverCompat) =>
                                                       SliverFillRemaining(
-                                                        child: buildMenuList(
-                                                            sliverCompat.generateScrollController(
+                                                    child: buildMenuList(
+                                                        sliverCompat
+                                                            .generateScrollController(
                                                                 tag: const Key(
                                                                     "3-1")),
-                                                            66),
-                                                      ),
+                                                        66),
+                                                  ),
                                                 )
                                               ],
                                             )),
@@ -263,7 +264,7 @@ class NestedScrollFragment extends StatelessWidget {
             SliverPersistentHeader(
                 pinned: true,
                 delegate: CustomSliverPersistentHeaderDelegate(
-                  maxExtent: 200,
+                  maxExtent: 300,
                   minExtent: MediaQuery.of(context).viewPadding.top,
                   child: AppBar(
                     title: const Text("SliverAppBar"),

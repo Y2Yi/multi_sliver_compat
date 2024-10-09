@@ -129,7 +129,7 @@ class CoherentSliverCompat {
         "(FlutterSourceCode)[coherent_sliver_compat.dart]->_submitAnimatedValueToTop layer receive($effectiveDebugKey):${value}");
     double remaining = value;
 
-    if (remaining.abs() > 0) {
+    if (remaining.abs() > precisionErrorTolerance) {
       // 向上提交
       remaining = CoherentSliverCompatDelegate.of(buildContext)
               ?.submitAnimatedValue(remaining) ??
