@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_delegate_widget.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_scroll_controller.dart';
 
@@ -34,13 +35,13 @@ class CoherentSliverCompat {
   double submitUserOffset(
       CoherentSliverCompatScrollPosition? submitter, double delta) {
     if (delta < 0) {
-      return onScrollToTop(submitter, delta);
+      return onScrollReverse(submitter, delta);
     } else {
-      return onScrollToBottom(submitter, delta);
+      return onScrollForward(submitter, delta);
     }
   }
 
-  double onScrollToTop(
+  double onScrollReverse(
       CoherentSliverCompatScrollPosition? submitter, double delta) {
     if (delta == 0) {
       return 0;
@@ -56,7 +57,7 @@ class CoherentSliverCompat {
       return 0;
     }
 
-    print('($effectiveDebugKey)ToTop  pha1: 剩余:$remaining');
+    print('($effectiveDebugKey)Reverse  pha1: 剩余:$remaining');
 
     // 结点内部消化
     if (_scrollController != null) {
@@ -65,12 +66,12 @@ class CoherentSliverCompat {
               .applyClampedDragUpdate(remaining);
     }
 
-    print('($effectiveDebugKey)ToTop  pha2: 剩余:$remaining');
+    print('($effectiveDebugKey)Reverse  pha2: 剩余:$remaining');
 
     return remaining;
   }
 
-  double onScrollToBottom(
+  double onScrollForward(
       CoherentSliverCompatScrollPosition? submitter, double delta) {
     double remaining = delta;
 
@@ -84,7 +85,7 @@ class CoherentSliverCompat {
           (_scrollController!.position as CoherentSliverCompatScrollPosition)
               .applyClampedDragUpdate(remaining);
     }
-    print('($effectiveDebugKey)ToBottom pha1: 剩余:$remaining');
+    print('($effectiveDebugKey)Forward pha1: 剩余:$remaining');
 
     if (remaining == 0) {
       return 0;
@@ -94,7 +95,7 @@ class CoherentSliverCompat {
     remaining = CoherentSliverCompatDelegate.of(buildContext)
             ?.onChildrenSubmit(remaining) ?? // 如果这里换成delta就可以实现多级同步滚动
         remaining;
-    print('($effectiveDebugKey)ToBottom pha2: 剩余:$remaining');
+    print('($effectiveDebugKey)Forward pha2: 剩余:$remaining');
 
     return remaining;
   }
@@ -104,46 +105,71 @@ class CoherentSliverCompat {
     return submitUserOffset(null, delta);
   }
 
-  double submitAnimatedValue(double value) {
+  double submitAnimatedValue(
+      double value, ScrollDirection lastEffectiveScrollDirection) {
     if (value.abs() < precisionErrorTolerance) {
       return value;
     }
-    // if (value < 0) {
-    //   // to Top
-    //   return _submitAnimatedValueToTop(value);
-    // } else {
-    //   // to bottom
-    //   return _submitAnimatedValueToBottom(value);
-    // }
-    return _submitAnimatedValueToTop(value);
+    if (lastEffectiveScrollDirection == ScrollDirection.forward) {
+      // to Top
+      return _submitAnimatedValueForward(-value);
+    } else {
+      // to bottom
+      return _submitAnimatedValueReverse(value);
+    }
   }
 
-  // // 祖先SliverCompat将无法准确获取到需要分发的下一个节点是哪一个
-  // double _submitAnimatedValueToBottom(double value) {
-  //   return (_scrollController!.position as CoherentSliverCompatScrollPosition)
-  //       .applyClampedDragUpdate(value);
-  // }
-
-  double _submitAnimatedValueToTop(double value) {
+  // 祖先SliverCompat将无法准确获取到需要分发的下一个节点是哪一个
+  double _submitAnimatedValueForward(double value) {
     print(
-        "(FlutterSourceCode)[coherent_sliver_compat.dart]->_submitAnimatedValueToTop layer receive($effectiveDebugKey):${value}");
+        "(FlutterSourceCode)[coherent_sliver_compat.dart]->_submitAnimatedValueForward layer receive($effectiveDebugKey):${value}");
     double remaining = value;
 
-    if (remaining.abs() > precisionErrorTolerance) {
-      // 向上提交
-      remaining = CoherentSliverCompatDelegate.of(buildContext)
-              ?.submitAnimatedValue(remaining) ??
-          remaining;
-    }
     if (remaining.abs() < precisionErrorTolerance) {
       return remaining;
     }
+    // 向上提交
+    remaining = CoherentSliverCompatDelegate.of(buildContext)
+            ?._submitAnimatedValueForward(remaining) ??
+        remaining;
+
+    if (remaining.abs() < precisionErrorTolerance) {
+      return remaining;
+    }
+    // 自己消费
     remaining =
         (_scrollController!.position as CoherentSliverCompatScrollPosition)
             .applyClampedDragUpdate(remaining);
 
     print(
-        "(FlutterSourceCode)[coherent_sliver_compat.dart]->_submitAnimatedValueToTop layer($effectiveDebugKey) remain:${remaining}");
+        "(FlutterSourceCode)[coherent_sliver_compat.dart]->_submitAnimatedValueForward layer($effectiveDebugKey) remain:${remaining}");
+    return remaining;
+  }
+
+  double _submitAnimatedValueReverse(double value) {
+    print(
+        "(FlutterSourceCode)[coherent_sliver_compat.dart]->_submitAnimatedValueReverse layer receive($effectiveDebugKey):${value}");
+    double remaining = value;
+
+    if (remaining.abs() < precisionErrorTolerance) {
+      return remaining;
+    }
+    // 自己消费
+    remaining =
+        (_scrollController!.position as CoherentSliverCompatScrollPosition)
+            .applyClampedDragUpdate(remaining);
+
+    if (remaining.abs() < precisionErrorTolerance) {
+      return remaining;
+    }
+
+    // 向上提交
+    remaining = CoherentSliverCompatDelegate.of(buildContext)
+            ?._submitAnimatedValueReverse(remaining) ??
+        remaining;
+
+    print(
+        "(FlutterSourceCode)[coherent_sliver_compat.dart]->_submitAnimatedValueReverse layer($effectiveDebugKey) remain:${remaining}");
     return remaining;
   }
 }
