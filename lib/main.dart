@@ -82,6 +82,7 @@ class _SliverCompatBizWidgetState extends State<SliverCompatBizWidget>
                 child: TabBarView(
                   controller: _tabController,
                   children: [
+                    _generateBallisticPage(),
                     _generateGoodsPage(),
                     _generateRatingPage(),
                     _generateStorePage(),
@@ -97,6 +98,9 @@ class _SliverCompatBizWidgetState extends State<SliverCompatBizWidget>
 
   List<Tab> _implementTabs() {
     return [
+      const Tab(
+        text: "弹性滚动",
+      ),
       const Tab(
         text: "同级嵌套滚动",
       ),
@@ -130,4 +134,6 @@ class _SliverCompatBizWidgetState extends State<SliverCompatBizWidget>
   _generateRatingPage() => RatingFragment();
 
   _generateStorePage() => NestedScrollFragment();
+
+  _generateBallisticPage() => BallisticFragment();
 }

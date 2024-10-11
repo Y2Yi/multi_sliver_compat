@@ -17,7 +17,6 @@ class CoherentSliverCompatScrollPosition
   /// 所有的偏移量统一交给CoherentSliverCompat去处理；
   @override
   void applyUserOffset(double delta) {
-    print("(FlutterSourceCode)[coherent_sliver_position.dart]->delta:${delta}");
     updateUserScrollDirection(
         delta < 0 ? ScrollDirection.forward : ScrollDirection.reverse);
     double remaining = sliverCompat.submitUserOffset(this, delta);
@@ -28,8 +27,6 @@ class CoherentSliverCompatScrollPosition
     }
 
     /// 该滚动量应该造成视图自身的弹性滚动
-    print(
-        "(FlutterSourceCode)[coherent_sliver_position.dart]->$debugKey 盈余滚动量:$remaining");
   }
 
   ScrollDirection _lastEffectiveScrollDirection = ScrollDirection.forward;
@@ -70,6 +67,8 @@ class CoherentSliverCompatScrollPosition
 
   @override
   void goBallistic(double velocity) {
+    super.goBallistic(velocity);
+    return;
     assert(hasPixels);
     if (velocity == 0) {
       goIdle();
@@ -79,8 +78,6 @@ class CoherentSliverCompatScrollPosition
     final Simulation? simulation =
         physics.createBallisticSimulation(this, velocity);
     if (simulation != null) {
-      print(
-          "(FlutterSourceCode)[coherent_sliver_position.dart]->goBallistic simulation is not null:${simulation.runtimeType},$_lastEffectiveScrollDirection");
       beginActivity(createBallisticScrollActivity(simulation));
     } else {
       goIdle();

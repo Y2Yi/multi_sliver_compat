@@ -121,8 +121,6 @@ class CoherentSliverCompat {
 
   // 祖先SliverCompat将无法准确获取到需要分发的下一个节点是哪一个
   double _submitAnimatedValueForward(double value) {
-    print(
-        "(FlutterSourceCode)[coherent_sliver_compat.dart]->_submitAnimatedValueForward layer receive($effectiveDebugKey):${value}");
     double remaining = value;
 
     if (remaining.abs() < precisionErrorTolerance) {
@@ -141,14 +139,10 @@ class CoherentSliverCompat {
         (_scrollController!.position as CoherentSliverCompatScrollPosition)
             .applyClampedDragUpdate(remaining);
 
-    print(
-        "(FlutterSourceCode)[coherent_sliver_compat.dart]->_submitAnimatedValueForward layer($effectiveDebugKey) remain:${remaining}");
     return remaining;
   }
 
   double _submitAnimatedValueReverse(double value) {
-    print(
-        "(FlutterSourceCode)[coherent_sliver_compat.dart]->_submitAnimatedValueReverse layer receive($effectiveDebugKey):${value}");
     double remaining = value;
 
     if (remaining.abs() < precisionErrorTolerance) {
@@ -168,8 +162,6 @@ class CoherentSliverCompat {
             ?._submitAnimatedValueReverse(remaining) ??
         remaining;
 
-    print(
-        "(FlutterSourceCode)[coherent_sliver_compat.dart]->_submitAnimatedValueReverse layer($effectiveDebugKey) remain:${remaining}");
     return remaining;
   }
 }

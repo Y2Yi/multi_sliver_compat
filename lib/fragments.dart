@@ -7,7 +7,7 @@ import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_
 import 'package:free_scroll_compat/multi_sliver_compat/sliver_compat.dart';
 import 'package:free_scroll_compat/sliver_persistent_header_delegate.dart';
 
-Widget buildMenu(double h) {
+Widget buildMenu(double h, {int? index}) {
   return Container(
     height: h,
     decoration: BoxDecoration(
@@ -17,9 +17,7 @@ Widget buildMenu(double h) {
     ),
     alignment: Alignment.center,
     child: Builder(builder: (context) {
-      return Text("${Random().nextInt(255)},"
-          "position:${Scrollable.of(context).position.hashCode},"
-          "${Scrollable.of(context).position.context}");
+      return Text("$index,${Random().nextInt(255)}");
     }),
   );
 }
@@ -31,7 +29,7 @@ Widget buildMenuList(ScrollController? scrollController, double h,
   }
   List<Widget> children = [];
   for (int i = 0; i < count; i++) {
-    children.add(buildMenu(h));
+    children.add(buildMenu(h, index: i));
   }
   return ListView(controller: scrollController, children: children);
 }
@@ -217,8 +215,6 @@ class RatingFragment extends StatelessWidget {
                                                       child: LayoutBuilder(
                                                         builder:
                                                             (ctx, constraint) {
-                                                          print(
-                                                              "(FlutterSourceCode)[fragments.dart]->${constraint.maxHeight}");
                                                           return AppBar(
                                                               title: Text(
                                                                   "${constraint.maxHeight}"));
@@ -284,5 +280,18 @@ class NestedScrollFragment extends StatelessWidget {
             )
           ],
         ));
+  }
+}
+
+class BallisticFragment extends StatelessWidget {
+  const BallisticFragment({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return CoherentSliverCompatWidget((context, sliverCompat) {
+      return buildMenuList(
+          sliverCompat.generateScrollController(tag: Key("Demo")), 72,
+          count: 128);
+    });
   }
 }

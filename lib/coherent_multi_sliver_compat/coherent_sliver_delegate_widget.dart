@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_compat.dart';
 
-typedef CoherentSliverCompatBuilder = Function(
-    BuildContext, CoherentSliverCompat);
+typedef CoherentSliverCompatBuilder = Widget Function(
+    BuildContext context, CoherentSliverCompat sliverCompat);
 
 class CoherentSliverCompatWidget extends StatefulWidget {
   final CoherentSliverCompatBuilder childBuilder;

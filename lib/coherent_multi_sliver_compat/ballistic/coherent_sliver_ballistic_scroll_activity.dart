@@ -23,17 +23,11 @@ class CoherentBallisticScrollActivity extends BallisticScrollActivity {
   /// 这就会导致另一个问题，如果不额外结合方向去处理这个value，就一定会有一个方向的滚动是异常的。
   @override
   bool applyMoveTo(double value) {
-    print(
-        "(FlutterSourceCode)[coherent_sliver_position.dart](ScrollActivity hashCode:${hashCode}) ------------------- ballistic tick $value");
 
     var remaining =
         sliverCompat.submitAnimatedValue(value, lastEffectiveScrollDirection);
 
-    print(
-        "(FlutterSourceCode)[coherent_sliver_position.dart]->applyMoveTo remaining $remaining");
     if (remaining == value) {
-      print(
-          "(FlutterSourceCode)[coherent_sliver_position.dart]->applyMoveTo full consume");
       return super.applyMoveTo(value);
     }
     return remaining.abs() < precisionErrorTolerance;
