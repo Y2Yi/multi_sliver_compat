@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/ballistic/coherent_sliver_ballistic_scroll_activity.dart';
+import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_ballistic_simulation.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_compat.dart';
 
 class CoherentSliverCompatScrollPosition
@@ -51,13 +52,12 @@ class CoherentSliverCompatScrollPosition
   @override
   void goBallistic(double velocity) {
     assert(hasPixels);
-    final Simulation? simulation =
-        physics.createBallisticSimulation(this, velocity);
-    if (simulation != null) {
-      beginActivity(createBallisticScrollActivity(simulation));
-    } else {
+    Simulation? simulation = createSimulation(this, velocity);
+    if (simulation == null) {
       goIdle();
+      return;
     }
+    beginActivity(createBallisticScrollActivity(simulation));
   }
 
   ScrollActivity createBallisticScrollActivity(Simulation simulation) {
@@ -75,5 +75,45 @@ class CoherentSliverCompatScrollPosition
   void forcePixels(double value) {
     // TODO: implement forcePixels
     super.forcePixels(value);
+  }
+
+  Simulation? createSimulation(ScrollMetrics position, double velocity) {
+    final Tolerance tolerance = toleranceFor(position);
+    if (outOfRange) {
+      double? end;
+      if (pixels > maxScrollExtent) {
+        end = maxScrollExtent;
+      }
+      if (pixels < minScrollExtent) {
+        end = minScrollExtent;
+      }
+      assert(end != null);
+      return ScrollSpringSimulation(
+        physics.spring,
+        pixels,
+        end!,
+        min(0.0, velocity),
+        tolerance: tolerance,
+      );
+    }
+    if (velocity.abs() < tolerance.velocity) {
+      return null;
+    }
+    if (velocity > 0.0 && pixels >= maxScrollExtent) {
+      return null;
+    }
+    if (velocity < 0.0 && pixels <= minScrollExtent) {
+      return null;
+    }
+    return CoherentBallisticSimulation(
+      position: pixels,
+      velocity: velocity,
+      tolerance: tolerance,
+    );
+  }
+
+  /// The tolerance to use for ballistic simulations.
+  Tolerance toleranceFor(ScrollMetrics metrics) {
+    return physics.toleranceFor(metrics);
   }
 }
