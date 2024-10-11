@@ -61,8 +61,13 @@ class CoherentSliverCompatScrollPosition
   }
 
   ScrollActivity createBallisticScrollActivity(Simulation simulation) {
-    return CoherentBallisticScrollActivity(sliverCompat, userScrollDirection,
-        this, simulation, context.vsync, activity?.shouldIgnorePointer ?? true);
+    return CoherentBallisticScrollActivity(
+        this,
+        sliverCompat,
+        userScrollDirection,
+        simulation,
+        context.vsync,
+        activity?.shouldIgnorePointer ?? false);
   }
 
   @override

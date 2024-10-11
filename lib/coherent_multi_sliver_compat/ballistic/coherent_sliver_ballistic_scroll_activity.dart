@@ -1,48 +1,97 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
+import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_compat.dart';
 
-import '../coherent_sliver_compat.dart';
-
-class CoherentBallisticScrollActivity extends BallisticScrollActivity {
+class CoherentBallisticScrollActivity extends ScrollActivity {
   ScrollDirection lastEffectiveScrollDirection;
-
-  CoherentBallisticScrollActivity(
-      this.sliverCompat,
-      this.lastEffectiveScrollDirection,
-      super.delegate,
-      super.simulation,
-      super.vsync,
-      super.shouldIgnorePointer);
-
   CoherentSliverCompat sliverCompat;
 
-  /// applyMoveTo产生的value，其实是velocity，用在惯性滚动中，就是此刻的速度。
-  /// 只要手指稍微快一点滚动，那么这个数值就有可能达到1000+甚至是3000+，直接会导致视图的偏移量打满。
-  /// 除此之外，这个数值是一个标量，他不具有方向含义，因此它在产生的时候具体的数值一定是正数，无论是视图向下还是向上，
-  /// 这就会导致另一个问题，如果不额外结合方向去处理这个value，就一定会有一个方向的滚动是异常的。
-  @override
-  bool applyMoveTo(double value) {
-    // var remaining =
-    //     sliverCompat.submitAnimatedValue(value, lastEffectiveScrollDirection);
-    //
-    // if (remaining == value) {
-    //   return super.applyMoveTo(value);
-    // }
-    // return remaining.abs() < precisionErrorTolerance;
-    return super.applyMoveTo(value);
+  /// Creates an activity that animates a scroll view based on a [simulation].
+  ///
+  /// The [delegate], [simulation], and [vsync] arguments must not be null.
+  CoherentBallisticScrollActivity(
+    super.delegate,
+    this.sliverCompat,
+    this.lastEffectiveScrollDirection,
+    Simulation simulation,
+    TickerProvider vsync,
+    this.shouldIgnorePointer,
+  ) {
+    _controller = AnimationController.unbounded(
+      debugLabel: kDebugMode
+          ? objectRuntimeType(this, 'CoherentBallisticScrollActivity')
+          : null,
+      vsync: vsync,
+    )
+      ..addListener(_tick)
+      ..animateWith(simulation)
+          .whenComplete(_end); // won't trigger if we dispose _controller first
   }
+
+  late AnimationController _controller;
 
   @override
   void resetActivity() {
-    print(
-        "(FlutterSourceCode)[coherent_sliver_position.dart]-> ScrollActivity(${this.hashCode}) reset!");
-    super.resetActivity();
+    delegate.goBallistic(velocity);
   }
 
   @override
+  void applyNewDimensions() {
+    delegate.goBallistic(velocity);
+  }
+
+  void _tick() {
+    if (!applyMoveTo(_controller.value)) {
+      delegate.goIdle();
+    }
+  }
+
+  /// Move the position to the given location.
+  ///
+  /// If the new position was fully applied, returns true. If there was any
+  /// overflow, returns false.
+  ///
+  /// The default implementation calls [ScrollActivityDelegate.setPixels]
+  /// and returns true if the overflow was zero.
+  @protected
+  bool applyMoveTo(double value) {
+    print("(FlutterSourceCode)[scroll_activity.dart]->applyMoveTo:$value");
+    return delegate.setPixels(value).abs() < precisionErrorTolerance;
+  }
+
+  void _end() {
+    delegate.goBallistic(0.0);
+  }
+
+  @override
+  void dispatchOverscrollNotification(
+      ScrollMetrics metrics, BuildContext context, double overscroll) {
+    OverscrollNotification(
+            metrics: metrics,
+            context: context,
+            overscroll: overscroll,
+            velocity: velocity)
+        .dispatch(context);
+  }
+
+  @override
+  final bool shouldIgnorePointer;
+
+  @override
+  bool get isScrolling => true;
+
+  @override
+  double get velocity => _controller.velocity;
+
+  @override
   void dispose() {
-    print(
-        "(FlutterSourceCode)[coherent_sliver_position.dart]->ScrollActivity(${this.hashCode} dispose!");
+    _controller.dispose();
     super.dispose();
+  }
+
+  @override
+  String toString() {
+    return '${describeIdentity(this)}($_controller)';
   }
 }
