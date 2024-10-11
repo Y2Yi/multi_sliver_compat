@@ -19,24 +19,7 @@ class CoherentSliverCompatScrollPosition
   void applyUserOffset(double delta) {
     updateUserScrollDirection(
         delta < 0 ? ScrollDirection.forward : ScrollDirection.reverse);
-    double remaining = sliverCompat.submitUserOffset(this, delta);
-
-    /// 剩余滚动量
-    if (remaining < precisionErrorTolerance) {
-      return;
-    }
-
-    /// 该滚动量应该造成视图自身的弹性滚动
-  }
-
-  ScrollDirection _lastEffectiveScrollDirection = ScrollDirection.forward;
-
-  @override
-  void updateUserScrollDirection(ScrollDirection value) {
-    if (value != ScrollDirection.idle) {
-      _lastEffectiveScrollDirection = value;
-    }
-    super.updateUserScrollDirection(value);
+    sliverCompat.submitUserOffset(this, delta);
   }
 
   /// 食用滚动量，然后返回未吃完的滚动量
@@ -67,14 +50,7 @@ class CoherentSliverCompatScrollPosition
 
   @override
   void goBallistic(double velocity) {
-    super.goBallistic(velocity);
-    return;
     assert(hasPixels);
-    if (velocity == 0) {
-      goIdle();
-      return;
-    }
-
     final Simulation? simulation =
         physics.createBallisticSimulation(this, velocity);
     if (simulation != null) {
@@ -85,12 +61,19 @@ class CoherentSliverCompatScrollPosition
   }
 
   ScrollActivity createBallisticScrollActivity(Simulation simulation) {
-    return CoherentBallisticScrollActivity(
-        sliverCompat,
-        _lastEffectiveScrollDirection,
-        this,
-        simulation,
-        context.vsync,
-        activity?.shouldIgnorePointer ?? true);
+    return CoherentBallisticScrollActivity(sliverCompat, userScrollDirection,
+        this, simulation, context.vsync, activity?.shouldIgnorePointer ?? true);
+  }
+
+  @override
+  double setPixels(double newPixels) {
+    // update pixels
+    return super.setPixels(newPixels);
+  }
+
+  @override
+  void forcePixels(double value) {
+    // TODO: implement forcePixels
+    super.forcePixels(value);
   }
 }

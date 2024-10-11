@@ -36,7 +36,7 @@ class _SliverCompatBizWidgetState extends State<SliverCompatBizWidget>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override

@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 
 import '../coherent_sliver_compat.dart';
@@ -23,14 +22,14 @@ class CoherentBallisticScrollActivity extends BallisticScrollActivity {
   /// 这就会导致另一个问题，如果不额外结合方向去处理这个value，就一定会有一个方向的滚动是异常的。
   @override
   bool applyMoveTo(double value) {
-
-    var remaining =
-        sliverCompat.submitAnimatedValue(value, lastEffectiveScrollDirection);
-
-    if (remaining == value) {
-      return super.applyMoveTo(value);
-    }
-    return remaining.abs() < precisionErrorTolerance;
+    // var remaining =
+    //     sliverCompat.submitAnimatedValue(value, lastEffectiveScrollDirection);
+    //
+    // if (remaining == value) {
+    //   return super.applyMoveTo(value);
+    // }
+    // return remaining.abs() < precisionErrorTolerance;
+    return super.applyMoveTo(value);
   }
 
   @override
