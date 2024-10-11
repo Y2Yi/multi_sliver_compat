@@ -6,6 +6,7 @@ import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_
 class CoherentBallisticScrollActivity extends ScrollActivity {
   ScrollDirection lastEffectiveScrollDirection;
   CoherentSliverCompat sliverCompat;
+  late Simulation _simulation;
 
   /// Creates an activity that animates a scroll view based on a [simulation].
   ///
@@ -27,6 +28,8 @@ class CoherentBallisticScrollActivity extends ScrollActivity {
       ..addListener(_tick)
       ..animateWith(simulation)
           .whenComplete(_end); // won't trigger if we dispose _controller first
+
+    _simulation = simulation;
   }
 
   late AnimationController _controller;
@@ -47,17 +50,28 @@ class CoherentBallisticScrollActivity extends ScrollActivity {
     }
   }
 
-  /// Move the position to the given location.
-  ///
-  /// If the new position was fully applied, returns true. If there was any
-  /// overflow, returns false.
-  ///
-  /// The default implementation calls [ScrollActivityDelegate.setPixels]
-  /// and returns true if the overflow was zero.
   @protected
   bool applyMoveTo(double value) {
-    print("(FlutterSourceCode)[scroll_activity.dart]->applyMoveTo:$value");
-    return delegate.setPixels(value).abs() < precisionErrorTolerance;
+    /// 当前层先消费滚动量，返回的overscroll
+
+    double delta = value - sliverCompat.scrollController.position.pixels; // 增量
+    print(
+        "(FlutterSourceCode)[coherent_sliver_ballistic_scroll_activity.dart]->(${sliverCompat.effectiveDebugKey})applyMoveTo delta:${delta}");
+
+    double overscroll = delegate.setPixels(value);
+
+    print(
+        "(FlutterSourceCode)[coherent_sliver_ballistic_scroll_activity.dart]->(${sliverCompat.effectiveDebugKey})applyMoveTo moveTo:${value}");
+
+    /// overscroll == 0
+    if (overscroll.abs() < precisionErrorTolerance) {
+      return true;
+    }
+
+    print(
+        "(FlutterSourceCode)[coherent_sliver_ballistic_scroll_activity.dart]->(${sliverCompat.effectiveDebugKey})applyMoveTo overscroll:${overscroll}");
+    sliverCompat.beginActivityToParent(overscroll, simulation: _simulation);
+    return true;
   }
 
   void _end() {

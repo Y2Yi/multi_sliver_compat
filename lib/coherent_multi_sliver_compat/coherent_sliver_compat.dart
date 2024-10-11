@@ -1,6 +1,3 @@
-import 'dart:collection';
-import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +15,9 @@ class CoherentSliverCompat {
   Key? get effectiveDebugKey => debugKey ?? _scrollController?.debugKey;
 
   CoherentSliverCompat(this.buildContext, {this.debugKey});
+
+  CoherentSliverCompatScrollController get scrollController =>
+      _scrollController!;
 
   CoherentSliverCompatScrollController? _scrollController;
 
@@ -105,63 +105,76 @@ class CoherentSliverCompat {
     return submitUserOffset(null, delta);
   }
 
-  double submitAnimatedValue(
-      double value, ScrollDirection lastEffectiveScrollDirection) {
-    if (value.abs() < precisionErrorTolerance) {
-      return value;
+  //
+  // double submitAnimatedValue(
+  //     double value, ScrollDirection lastEffectiveScrollDirection) {
+  //   if (value.abs() < precisionErrorTolerance) {
+  //     return value;
+  //   }
+  //   if (lastEffectiveScrollDirection == ScrollDirection.forward) {
+  //     // to Top
+  //     return _submitAnimatedValueForward(-value);
+  //   } else {
+  //     // to bottom
+  //     return _submitAnimatedValueReverse(value);
+  //   }
+  // }
+  //
+  // // 祖先SliverCompat将无法准确获取到需要分发的下一个节点是哪一个
+  // double _submitAnimatedValueForward(double value) {
+  //   double remaining = value;
+  //
+  //   if (remaining.abs() < precisionErrorTolerance) {
+  //     return remaining;
+  //   }
+  //   // 向上提交
+  //   remaining = CoherentSliverCompatDelegate.of(buildContext)
+  //           ?._submitAnimatedValueForward(remaining) ??
+  //       remaining;
+  //
+  //   if (remaining.abs() < precisionErrorTolerance) {
+  //     return remaining;
+  //   }
+  //   // 自己消费
+  //   remaining =
+  //       (_scrollController!.position as CoherentSliverCompatScrollPosition)
+  //           .applyClampedDragUpdate(remaining);
+  //
+  //   return remaining;
+  // }
+  //
+  // double _submitAnimatedValueReverse(double value) {
+  //   double remaining = value;
+  //
+  //   if (remaining.abs() < precisionErrorTolerance) {
+  //     return remaining;
+  //   }
+  //   // 自己消费
+  //   remaining =
+  //       (_scrollController!.position as CoherentSliverCompatScrollPosition)
+  //           .applyClampedDragUpdate(remaining);
+  //
+  //   if (remaining.abs() < precisionErrorTolerance) {
+  //     return remaining;
+  //   }
+  //
+  //   // 向上提交
+  //   remaining = CoherentSliverCompatDelegate.of(buildContext)
+  //           ?._submitAnimatedValueReverse(remaining) ??
+  //       remaining;
+  //
+  //   return remaining;
+  // }
+
+  void beginActivityToParent(double overscroll,
+      {required Simulation simulation}) {
+    ScrollPosition? position = CoherentSliverCompatDelegate.of(buildContext)
+        ?.scrollController
+        .position;
+    if (position == null) {
+      return;
     }
-    if (lastEffectiveScrollDirection == ScrollDirection.forward) {
-      // to Top
-      return _submitAnimatedValueForward(-value);
-    } else {
-      // to bottom
-      return _submitAnimatedValueReverse(value);
-    }
-  }
-
-  // 祖先SliverCompat将无法准确获取到需要分发的下一个节点是哪一个
-  double _submitAnimatedValueForward(double value) {
-    double remaining = value;
-
-    if (remaining.abs() < precisionErrorTolerance) {
-      return remaining;
-    }
-    // 向上提交
-    remaining = CoherentSliverCompatDelegate.of(buildContext)
-            ?._submitAnimatedValueForward(remaining) ??
-        remaining;
-
-    if (remaining.abs() < precisionErrorTolerance) {
-      return remaining;
-    }
-    // 自己消费
-    remaining =
-        (_scrollController!.position as CoherentSliverCompatScrollPosition)
-            .applyClampedDragUpdate(remaining);
-
-    return remaining;
-  }
-
-  double _submitAnimatedValueReverse(double value) {
-    double remaining = value;
-
-    if (remaining.abs() < precisionErrorTolerance) {
-      return remaining;
-    }
-    // 自己消费
-    remaining =
-        (_scrollController!.position as CoherentSliverCompatScrollPosition)
-            .applyClampedDragUpdate(remaining);
-
-    if (remaining.abs() < precisionErrorTolerance) {
-      return remaining;
-    }
-
-    // 向上提交
-    remaining = CoherentSliverCompatDelegate.of(buildContext)
-            ?._submitAnimatedValueReverse(remaining) ??
-        remaining;
-
-    return remaining;
+    (position as CoherentSliverCompatScrollPosition)
+        .acceptBallisticValueWithAnimationController(overscroll, simulation);
   }
 }

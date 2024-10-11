@@ -60,6 +60,18 @@ class CoherentSliverCompatScrollPosition
     beginActivity(createBallisticScrollActivity(simulation));
   }
 
+  void acceptBallisticValueWithAnimationController(
+      double overscroll, Simulation simulation) {
+    (simulation as CoherentBallisticSimulation).updatePosition(pixels);
+    beginActivity(CoherentBallisticScrollActivity(
+        this,
+        sliverCompat,
+        userScrollDirection,
+        simulation,
+        context.vsync,
+        activity?.shouldIgnorePointer ?? false));
+  }
+
   ScrollActivity createBallisticScrollActivity(Simulation simulation) {
     return CoherentBallisticScrollActivity(
         this,
