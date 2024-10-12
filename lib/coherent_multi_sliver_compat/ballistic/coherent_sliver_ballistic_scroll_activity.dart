@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_compat.dart';
+import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_position.dart';
 
 class CoherentBallisticScrollActivity extends ScrollActivity {
   ScrollDirection lastEffectiveScrollDirection;
@@ -50,27 +51,21 @@ class CoherentBallisticScrollActivity extends ScrollActivity {
     }
   }
 
+  double get layerPixels =>
+      (delegate as CoherentSliverCompatScrollPosition).pixels;
+
   @protected
   bool applyMoveTo(double value) {
     /// 当前层先消费滚动量，返回的overscroll
 
-    double delta = value - sliverCompat.scrollController.position.pixels; // 增量
+    double delta = value - layerPixels; // 增量
     print(
-        "(FlutterSourceCode)[coherent_sliver_ballistic_scroll_activity.dart]->(${sliverCompat.effectiveDebugKey})applyMoveTo delta:${delta}");
-
-    double overscroll = delegate.setPixels(value);
-
-    print(
-        "(FlutterSourceCode)[coherent_sliver_ballistic_scroll_activity.dart]->(${sliverCompat.effectiveDebugKey})applyMoveTo moveTo:${value}");
-
-    /// overscroll == 0
-    if (overscroll.abs() < precisionErrorTolerance) {
-      return true;
+        "(FlutterSourceCode)[coherent_sliver_ballistic_scroll_activity.dart]->applyMoveTo delta:${delta}");
+    if (delta < 0) {
+      sliverCompat.ballisticTransformReverse(value, delta, _simulation);
+    } else {
+      sliverCompat.ballisticTransformForward(value, delta, _simulation);
     }
-
-    print(
-        "(FlutterSourceCode)[coherent_sliver_ballistic_scroll_activity.dart]->(${sliverCompat.effectiveDebugKey})applyMoveTo overscroll:${overscroll}");
-    sliverCompat.beginActivityToParent(overscroll, simulation: _simulation);
     return true;
   }
 

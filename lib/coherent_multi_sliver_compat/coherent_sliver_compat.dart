@@ -177,4 +177,25 @@ class CoherentSliverCompat {
     (position as CoherentSliverCompatScrollPosition)
         .acceptBallisticValueWithAnimationController(overscroll, simulation);
   }
+
+  CoherentSliverCompatScrollPosition get position =>
+      scrollController.position as CoherentSliverCompatScrollPosition;
+
+  /// reverse direction
+  ballisticTransformReverse(double value, double delta, Simulation simulation) {
+    double overscroll = position.setPixels(value);
+
+    /// overscroll == 0
+    if (overscroll.abs() < precisionErrorTolerance) {
+      return;
+    }
+
+    if (delta.abs() > precisionErrorTolerance) {
+      beginActivityToParent(overscroll, simulation: simulation);
+    }
+    return;
+  }
+
+  void ballisticTransformForward(
+      double value, double delta, Simulation simulation) {}
 }
