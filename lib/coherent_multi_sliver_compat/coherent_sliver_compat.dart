@@ -191,6 +191,8 @@ class CoherentSliverCompat {
     }
 
     if (delta.abs() > precisionErrorTolerance) {
+      // 自身需要立即停止动画
+      position.goIdle();
       beginActivityToParent(overscroll, simulation: simulation);
     }
     return;
