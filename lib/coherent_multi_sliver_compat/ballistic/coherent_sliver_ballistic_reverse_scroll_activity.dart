@@ -7,8 +7,7 @@ import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_
 typedef ScrollActivityDelegateListener = Function(
     ScrollActivityDelegate delegate);
 
-@Deprecated("useless")
-class CoherentBallisticScrollActivity extends ScrollActivity {
+class CoherentBallisticReverseScrollActivity extends ScrollActivity {
   ScrollDirection lastEffectiveScrollDirection;
   CoherentSliverCompat sliverCompat;
   late Simulation _simulation;
@@ -16,7 +15,7 @@ class CoherentBallisticScrollActivity extends ScrollActivity {
   /// Creates an activity that animates a scroll view based on a [simulation].
   ///
   /// The [delegate], [simulation], and [vsync] arguments must not be null.
-  CoherentBallisticScrollActivity(
+  CoherentBallisticReverseScrollActivity(
     super.delegate,
     this.sliverCompat,
     this.lastEffectiveScrollDirection,
@@ -26,7 +25,7 @@ class CoherentBallisticScrollActivity extends ScrollActivity {
   ) {
     _controller = AnimationController.unbounded(
       debugLabel: kDebugMode
-          ? objectRuntimeType(this, 'CoherentBallisticScrollActivity')
+          ? objectRuntimeType(this, 'CoherentBallisticReverseScrollActivity')
           : null,
       vsync: vsync,
     )
@@ -50,30 +49,17 @@ class CoherentBallisticScrollActivity extends ScrollActivity {
   }
 
   void _tick() {
-    assert(false);
-    if (!applyMoveTo(_controller.value)) {
+    var newPixels = _controller.value;
+    var overscroll = delegate.setPixels(newPixels);
+    if (overscroll.abs() >= precisionErrorTolerance) {
       delegate.goIdle();
+      // passToParent
+      sliverCompat.beginActivityToParent(overscroll, simulation: _simulation);
     }
   }
 
   double get layerPixels =>
       (delegate as CoherentSliverCompatScrollPosition).pixels;
-
-  @protected
-  bool applyMoveTo(double value) {
-    /// 当前层先消费滚动量，返回的overscroll
-
-    double delta = value - layerPixels; // 增量
-    print(
-        "(FlutterSourceCode)[coherent_sliver_ballistic_scroll_activity.dart]->applyMoveTo(${sliverCompat.effectiveDebugKey}) delta:${delta}");
-    if (delta <= 0) {
-      sliverCompat.ballisticTransformReverse(value, delta, _simulation);
-    } else {
-      sliverCompat.ballisticTransformForward(value, delta, _simulation);
-      return false; // do not continue;
-    }
-    return true;
-  }
 
   void _end() {
     delegate.goBallistic(0.0);

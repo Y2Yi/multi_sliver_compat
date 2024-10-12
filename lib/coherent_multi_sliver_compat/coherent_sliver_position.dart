@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:free_scroll_compat/coherent_multi_sliver_compat/ballistic/coherent_sliver_ballistic_reverse_scroll_activity.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/ballistic/coherent_sliver_ballistic_scroll_activity.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_ballistic_simulation.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_compat.dart';
@@ -67,7 +68,7 @@ class CoherentSliverCompatScrollPosition
   void acceptBallisticValueWithAnimationController(
       double overscroll, Simulation simulation) {
     (simulation as CoherentBallisticSimulation).updatePosition(pixels);
-    beginActivity(CoherentBallisticScrollActivity(
+    beginActivity(CoherentBallisticReverseScrollActivity(
         this,
         sliverCompat,
         userScrollDirection,
@@ -77,7 +78,7 @@ class CoherentSliverCompatScrollPosition
   }
 
   ScrollActivity createBallisticScrollActivity(Simulation simulation) {
-    return CoherentBallisticScrollActivity(
+    return CoherentBallisticReverseScrollActivity(
         this,
         sliverCompat,
         userScrollDirection,
