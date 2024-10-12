@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_compat.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_delegate_widget.dart';
+import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_scroll_controller.dart';
 import 'package:free_scroll_compat/multi_sliver_compat/sliver_compat.dart';
 import 'package:free_scroll_compat/sliver_persistent_header_delegate.dart';
 
@@ -131,121 +132,192 @@ class GoodsFragment extends StatelessWidget {
   }
 }
 
-class RatingFragment extends StatelessWidget {
+class RatingFragment extends StatefulWidget {
   const RatingFragment({super.key});
 
   @override
+  State<RatingFragment> createState() => _RatingFragmentState();
+}
+
+class _RatingFragmentState extends State<RatingFragment> {
+  late ScrollController retainingController;
+  late ScrollController retainingListViewController;
+
+  @override
   Widget build(BuildContext context) {
-    return CoherentSliverCompatWidget((context, sliverCompat) =>
-        CustomScrollView(
-          controller:
-              sliverCompat.generateScrollController(tag: const Key("1")),
-          slivers: [
-            SliverPersistentHeader(
-                pinned: true,
-                delegate: CustomSliverPersistentHeaderDelegate(
-                  maxExtent: 100,
-                  minExtent: MediaQuery.of(context).viewPadding.top,
-                  child: AppBar(
-                    title: const Text("SliverAppBar"),
-                  ),
-                )),
-            SliverFillRemaining(
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 1,
-                    child: CoherentSliverCompatWidget((ctx, sliverCompat) =>
-                        buildMenuList(
-                            sliverCompat.generateScrollController(
-                                tag: const Key("1-1")),
-                            64)),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: CoherentSliverCompatWidget((ctx, sliverCompat) =>
-                        buildMenuList(
-                            sliverCompat.generateScrollController(
-                                tag: const Key("1-2")),
-                            96)),
-                  ),
-                  Expanded(
-                    flex: 4,
-                    child: CoherentSliverCompatWidget((ctx, sliverCompat) =>
-                        CustomScrollView(
-                          controller: sliverCompat.generateScrollController(
-                              tag: Key("2")),
-                          slivers: [
-                            SliverPersistentHeader(
-                                pinned: true,
-                                delegate: CustomSliverPersistentHeaderDelegate(
-                                  maxExtent: 200,
-                                  minExtent:
-                                      MediaQuery.of(context).viewPadding.top,
-                                  child: AppBar(
-                                    title: const Text("SliverAppBar"),
-                                  ),
-                                )),
-                            SliverFillRemaining(
-                              child: Row(
-                                children: [
-                                  const FittedBox(
-                                    child: SizedBox(
-                                      height: 320,
-                                      child: Text("CommonView"),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 4,
-                                    child: CoherentSliverCompatWidget(
-                                        (ctx, sliverCompat) => CustomScrollView(
-                                              controller: sliverCompat
-                                                  .generateScrollController(
-                                                      tag: Key("3")),
-                                              slivers: [
-                                                SliverPersistentHeader(
-                                                    pinned: true,
-                                                    delegate:
-                                                        CustomSliverPersistentHeaderDelegate(
-                                                      maxExtent: 300,
-                                                      minExtent:
-                                                          MediaQuery.of(context)
-                                                              .viewPadding
-                                                              .top,
-                                                      child: LayoutBuilder(
-                                                        builder:
-                                                            (ctx, constraint) {
-                                                          return AppBar(
-                                                              title: Text(
-                                                                  "${constraint.maxHeight}"));
-                                                        },
-                                                      ),
-                                                    )),
-                                                CoherentSliverCompatWidget(
-                                                  (ctx, sliverCompat) =>
-                                                      SliverFillRemaining(
-                                                    child: buildMenuList(
-                                                        sliverCompat
-                                                            .generateScrollController(
-                                                                tag: const Key(
-                                                                    "3-1")),
-                                                        66),
-                                                  ),
-                                                )
-                                              ],
-                                            )),
-                                  ),
-                                ],
-                              ),
-                            )
-                          ],
-                        )),
-                  )
-                ],
-              ),
+    return Scaffold(
+        floatingActionButton: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                FloatingActionButton(
+                  onPressed: () {
+                    ((retainingController.position) as ScrollActivityDelegate)
+                        .goBallistic(10000);
+                  },
+                  child: Icon(Icons.upgrade),
+                  tooltip: "scroll to top",
+                  heroTag: "top",
+                ),
+                FloatingActionButton(
+                  onPressed: () {
+                    ((retainingController.position) as ScrollActivityDelegate)
+                        .goBallistic(-10000);
+                  },
+                  child: Icon(Icons.downhill_skiing),
+                  tooltip: "scroll to bottom",
+                  heroTag: "bottom",
+                ),
+              ],
+            ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                FloatingActionButton(
+                  onPressed: () {
+                    ((retainingListViewController.position)
+                            as ScrollActivityDelegate)
+                        .goBallistic(1000);
+                  },
+                  child: Icon(Icons.upgrade),
+                  tooltip: "scroll to top",
+                  backgroundColor: Colors.red,
+                  heroTag: "top",
+                ),
+                FloatingActionButton(
+                  onPressed: () {
+                    ((retainingListViewController.position)
+                            as ScrollActivityDelegate)
+                        .goBallistic(-1000);
+                  },
+                  child: Icon(Icons.downhill_skiing),
+                  tooltip: "scroll to bottom",
+                  backgroundColor: Colors.red,
+                  heroTag: "bottom",
+                ),
+              ],
             ),
           ],
-        ));
+        ),
+        body: CoherentSliverCompatWidget((context, sliverCompat) {
+          retainingController =
+              sliverCompat.generateScrollController(tag: const Key("1"));
+          return CustomScrollView(
+            controller: retainingController,
+            slivers: [
+              SliverPersistentHeader(
+                  pinned: true,
+                  delegate: CustomSliverPersistentHeaderDelegate(
+                    maxExtent: 100,
+                    minExtent: MediaQuery.of(context).viewPadding.top,
+                    child: AppBar(
+                      title: const Text("SliverAppBar"),
+                    ),
+                  )),
+              SliverFillRemaining(
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: CoherentSliverCompatWidget((ctx, sliverCompat) =>
+                          buildMenuList(
+                              sliverCompat.generateScrollController(
+                                  tag: const Key("1-1")),
+                              64)),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: CoherentSliverCompatWidget((ctx, sliverCompat) =>
+                          buildMenuList(
+                              sliverCompat.generateScrollController(
+                                  tag: const Key("1-2")),
+                              96)),
+                    ),
+                    Expanded(
+                      flex: 4,
+                      child: CoherentSliverCompatWidget((ctx, sliverCompat) =>
+                          CustomScrollView(
+                            controller: sliverCompat.generateScrollController(
+                                tag: Key("2")),
+                            slivers: [
+                              SliverPersistentHeader(
+                                  pinned: true,
+                                  delegate:
+                                      CustomSliverPersistentHeaderDelegate(
+                                    maxExtent: 200,
+                                    minExtent:
+                                        MediaQuery.of(context).viewPadding.top,
+                                    child: AppBar(
+                                      title: const Text("SliverAppBar"),
+                                    ),
+                                  )),
+                              SliverFillRemaining(
+                                child: Row(
+                                  children: [
+                                    const FittedBox(
+                                      child: SizedBox(
+                                        height: 320,
+                                        child: Text("CommonView"),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      flex: 4,
+                                      child: CoherentSliverCompatWidget((ctx,
+                                              sliverCompat) =>
+                                          CustomScrollView(
+                                            controller: sliverCompat
+                                                .generateScrollController(
+                                                    tag: Key("3")),
+                                            slivers: [
+                                              SliverPersistentHeader(
+                                                  pinned: true,
+                                                  delegate:
+                                                      CustomSliverPersistentHeaderDelegate(
+                                                    maxExtent: 300,
+                                                    minExtent:
+                                                        MediaQuery.of(context)
+                                                            .viewPadding
+                                                            .top,
+                                                    child: LayoutBuilder(
+                                                      builder:
+                                                          (ctx, constraint) {
+                                                        return AppBar(
+                                                            title: Text(
+                                                                "${constraint.maxHeight}"));
+                                                      },
+                                                    ),
+                                                  )),
+                                              CoherentSliverCompatWidget(
+                                                (ctx, sliverCompat) {
+                                                  retainingListViewController =
+                                                      sliverCompat
+                                                          .generateScrollController(
+                                                              tag: const Key(
+                                                                  "3-1"));
+                                                  return SliverFillRemaining(
+                                                    child: buildMenuList(
+                                                        retainingListViewController,
+                                                        66),
+                                                  );
+                                                },
+                                              )
+                                            ],
+                                          )),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          )),
+                    )
+                  ],
+                ),
+              ),
+            ],
+          );
+        }));
   }
 }
 
