@@ -116,12 +116,14 @@ class CoherentSliverCompatScrollPosition
     if (velocity.abs() < tolerance.velocity) {
       return null;
     }
-    if (velocity > 0.0 && pixels >= maxScrollExtent) {
-      return null;
-    }
-    if (velocity < 0.0 && pixels <= minScrollExtent) {
-      return null;
-    }
+    /// 滚动量实际上会超过当前视图往外分发，其实就不在需要ClampingScrollSimulation中的这段越界检查逻辑了
+    /// 越界的滚动量会由CoherentBallisticScrollActivity处理。
+    // if (velocity > 0.0 && pixels >= maxScrollExtent) {
+    //   return null;
+    // }
+    // if (velocity < 0.0 && pixels <= minScrollExtent) {
+    //   return null;
+    // }
     return CoherentBallisticSimulation(
       position: pixels,
       velocity: velocity,
