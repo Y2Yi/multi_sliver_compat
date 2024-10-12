@@ -15,6 +15,10 @@ class CoherentSliverCompatScrollPosition
   CoherentSliverCompatScrollPosition(this.sliverCompat,
       {required super.physics, required super.context, this.debugKey});
 
+  bool get canScrollReverse => minScrollExtent < pixels;
+
+  bool get canScrollForward => maxScrollExtent > pixels;
+
   /// 所有的偏移量统一交给CoherentSliverCompat去处理；
   @override
   void applyUserOffset(double delta) {
@@ -116,6 +120,7 @@ class CoherentSliverCompatScrollPosition
     if (velocity.abs() < tolerance.velocity) {
       return null;
     }
+
     /// 滚动量实际上会超过当前视图往外分发，其实就不在需要ClampingScrollSimulation中的这段越界检查逻辑了
     /// 越界的滚动量会由CoherentBallisticScrollActivity处理。
     // if (velocity > 0.0 && pixels >= maxScrollExtent) {

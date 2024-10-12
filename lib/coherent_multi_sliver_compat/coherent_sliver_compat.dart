@@ -1,7 +1,11 @@
+import 'dart:collection';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:free_scroll_compat/coherent_multi_sliver_compat/ballistic/coherent_sliver_ballistic_scroll_activity.dart';
+import 'package:free_scroll_compat/coherent_multi_sliver_compat/ballistic/coherent_sliver_fall_down_ballistic_scroll_activity.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_delegate_widget.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_scroll_controller.dart';
 
@@ -199,5 +203,94 @@ class CoherentSliverCompat {
   }
 
   void ballisticTransformForward(
-      double value, double delta, Simulation simulation) {}
+      double value, double delta, Simulation simulation) {
+    if (delta == 0) {
+      return;
+    }
+    position.goIdle();
+    CoherentFallDownScrollActivityManager manager =
+        CoherentFallDownScrollActivityManager(
+            ScrollDirection.forward, simulation);
+    onBallisticTransformForward(manager);
+  }
+
+  void onBallisticTransformForward(
+      CoherentFallDownScrollActivityManager manager) {
+    // 需要在这个方向上滚动
+    manager.addScrollActivityDelegate(position);
+    CoherentSliverCompat? lastLayer =
+        CoherentSliverCompatDelegate.of(buildContext);
+    if (lastLayer == null) {
+      // 已经是最高层了
+      print(
+          "(FlutterSourceCode)[coherent_sliver_compat.dart]->(${effectiveDebugKey} fall down)");
+      manager.startFallDown();
+    } else {
+      // 继续标记
+      print(
+          "(FlutterSourceCode)[coherent_sliver_compat.dart]->($effectiveDebugKey mark)");
+      // 如果轴上可以滚动要加个判断
+      if (position.canScrollForward) {
+        lastLayer.onBallisticTransformForward(manager);
+      }
+    }
+  }
+}
+
+/// 一个新的ScrollActivityDelegate的前端，用于管理在向上传递弹性滚动事件
+/// 持有路径节点中会消费弹性滚动事件的所有节点的ScrollActivityDelegate，也就是ScrollPosition
+class CoherentFallDownScrollActivityManager {
+  final Queue<ScrollActivityDelegate> _list = Queue();
+  late CoherentFallDownBallisticScrollActivity _activity;
+  final ScrollDirection _lastEffectiveScrollDirection;
+  final Simulation _simulation;
+
+  CoherentFallDownScrollActivityManager(
+      this._lastEffectiveScrollDirection, this._simulation);
+
+  addScrollActivityDelegate(ScrollActivityDelegate delegate) {
+    _list.add(delegate);
+  }
+
+  removeScrollActivityDelegate(ScrollActivityDelegate delegate) {
+    _list.removeWhere((element) => element == delegate);
+  }
+
+  ScrollActivityDelegate? get head => _list.lastOrNull;
+
+  startFallDown() {
+    if (head == null) {
+      return;
+    }
+    for (var element in _list) {
+      element.goIdle();
+    }
+    handleCurrentNode();
+  }
+
+  handleCurrentNode() {
+    if (head == null) {
+      return;
+    }
+
+    /// 更新下一个Delegate
+    _activity = CoherentFallDownBallisticScrollActivity(
+        head!,
+        _lastEffectiveScrollDirection,
+        this,
+        _simulation,
+        (head as CoherentSliverCompatScrollPosition).context.vsync,
+        false // shouldIgnorePointer
+        );
+    print(
+        "(FlutterSourceCode)[coherent_sliver_compat.dart]->CoherentFallDownScrollActivityManager::handleNode - start:${(head as CoherentSliverCompatScrollPosition).sliverCompat.effectiveDebugKey}");
+    (head as CoherentSliverCompatScrollPosition).beginActivity(_activity);
+  }
+
+  void onNodeCompleteListener(ScrollActivityDelegate completedDelegate) {
+    print(
+        "(FlutterSourceCode)[coherent_sliver_compat.dart]->CoherentFallDownScrollActivityManager::handleNode - end:${(head as CoherentSliverCompatScrollPosition).sliverCompat.effectiveDebugKey}");
+    removeScrollActivityDelegate(completedDelegate);
+    handleCurrentNode();
+  }
 }

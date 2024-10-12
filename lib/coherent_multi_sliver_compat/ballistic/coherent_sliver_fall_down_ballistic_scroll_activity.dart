@@ -3,37 +3,35 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_compat.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_position.dart';
+import 'package:free_scroll_compat/multi_sliver_compat/sliver_compat.dart';
 
 typedef ScrollActivityDelegateListener = Function(
     ScrollActivityDelegate delegate);
 
-class CoherentBallisticScrollActivity extends ScrollActivity {
+class CoherentFallDownBallisticScrollActivity extends ScrollActivity {
   ScrollDirection lastEffectiveScrollDirection;
-  CoherentSliverCompat sliverCompat;
-  late Simulation _simulation;
+  CoherentFallDownScrollActivityManager manager;
 
   /// Creates an activity that animates a scroll view based on a [simulation].
   ///
   /// The [delegate], [simulation], and [vsync] arguments must not be null.
-  CoherentBallisticScrollActivity(
+  CoherentFallDownBallisticScrollActivity(
     super.delegate,
-    this.sliverCompat,
     this.lastEffectiveScrollDirection,
+    this.manager,
     Simulation simulation,
     TickerProvider vsync,
     this.shouldIgnorePointer,
   ) {
     _controller = AnimationController.unbounded(
       debugLabel: kDebugMode
-          ? objectRuntimeType(this, 'CoherentBallisticScrollActivity')
+          ? objectRuntimeType(this, 'CoherentFallDownBallisticScrollActivity')
           : null,
       vsync: vsync,
     )
       ..addListener(_tick)
       ..animateWith(simulation)
           .whenComplete(_end); // won't trigger if we dispose _controller first
-
-    _simulation = simulation;
   }
 
   late AnimationController _controller;
@@ -50,6 +48,7 @@ class CoherentBallisticScrollActivity extends ScrollActivity {
 
   void _tick() {
     if (!applyMoveTo(_controller.value)) {
+      manager.onNodeCompleteListener(delegate);
       delegate.goIdle();
     }
   }
@@ -57,20 +56,13 @@ class CoherentBallisticScrollActivity extends ScrollActivity {
   double get layerPixels =>
       (delegate as CoherentSliverCompatScrollPosition).pixels;
 
+  CoherentSliverCompat get layerSliverCompat =>
+      (delegate as CoherentSliverCompatScrollPosition).sliverCompat;
+
+  /// 这东西返回的结果是是否在当前组件上滚动完成
   @protected
   bool applyMoveTo(double value) {
-    /// 当前层先消费滚动量，返回的overscroll
-
-    double delta = value - layerPixels; // 增量
-    print(
-        "(FlutterSourceCode)[coherent_sliver_ballistic_scroll_activity.dart]->applyMoveTo(${sliverCompat.effectiveDebugKey}) delta:${delta}");
-    if (delta <= 0) {
-      sliverCompat.ballisticTransformReverse(value, delta, _simulation);
-    } else {
-      sliverCompat.ballisticTransformForward(value, delta, _simulation);
-      return false; // do not continue;
-    }
-    return true;
+    return delegate.setPixels(value).abs() > precisionErrorTolerance;
   }
 
   void _end() {
