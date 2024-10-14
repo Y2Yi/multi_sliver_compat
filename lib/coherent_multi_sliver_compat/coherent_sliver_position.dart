@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:free_scroll_compat/coherent_multi_sliver_compat/ballistic/coherent_sliver_ballistic_forward_scroll_activity.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/ballistic/coherent_sliver_ballistic_reverse_scroll_activity.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/ballistic/coherent_sliver_ballistic_scroll_activity.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_ballistic_simulation.dart';
@@ -62,7 +63,26 @@ class CoherentSliverCompatScrollPosition
       goIdle();
       return;
     }
-    beginActivity(createBallisticScrollActivity(simulation));
+    if (velocity == 0) {
+      return;
+    }
+
+    /// 这里不能用userScrollDirection来判断方向，因为弹性滚动开始的时候，往往整个Scrollable会处于idle状态。
+    /// userScrollDirection的值一般也是idle，而不是forward或者reverse
+    if (velocity > 0) {
+      // forward
+      goIdle();
+      sliverCompat.ballisticTransformForward(simulation);
+    } else {
+      // reverse
+      beginActivity(CoherentBallisticReverseScrollActivity(
+          this,
+          sliverCompat,
+          userScrollDirection,
+          simulation,
+          context.vsync,
+          activity?.shouldIgnorePointer ?? false));
+    }
   }
 
   void acceptBallisticValueWithAnimationController(
@@ -75,16 +95,6 @@ class CoherentSliverCompatScrollPosition
         simulation,
         context.vsync,
         activity?.shouldIgnorePointer ?? false));
-  }
-
-  ScrollActivity createBallisticScrollActivity(Simulation simulation) {
-    return CoherentBallisticReverseScrollActivity(
-        this,
-        sliverCompat,
-        userScrollDirection,
-        simulation,
-        context.vsync,
-        activity?.shouldIgnorePointer ?? false);
   }
 
   @override

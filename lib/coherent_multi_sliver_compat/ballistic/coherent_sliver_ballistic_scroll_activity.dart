@@ -69,7 +69,7 @@ class CoherentBallisticScrollActivity extends ScrollActivity {
     if (delta <= 0) {
       sliverCompat.ballisticTransformReverse(value, delta, _simulation);
     } else {
-      sliverCompat.ballisticTransformForward(value, delta, _simulation);
+      sliverCompat.ballisticTransformForward(_simulation);
       return false; // do not continue;
     }
     return true;

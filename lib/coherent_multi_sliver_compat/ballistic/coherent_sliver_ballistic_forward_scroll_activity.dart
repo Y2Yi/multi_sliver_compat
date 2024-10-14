@@ -8,16 +8,14 @@ import 'package:free_scroll_compat/multi_sliver_compat/sliver_compat.dart';
 typedef ScrollActivityDelegateListener = Function(
     ScrollActivityDelegate delegate);
 
-class CoherentFallDownBallisticScrollActivity extends ScrollActivity {
-  ScrollDirection lastEffectiveScrollDirection;
+class CoherentBallisticForwardScrollActivity extends ScrollActivity {
   CoherentFallDownScrollActivityManager manager;
 
   /// Creates an activity that animates a scroll view based on a [simulation].
   ///
   /// The [delegate], [simulation], and [vsync] arguments must not be null.
-  CoherentFallDownBallisticScrollActivity(
+  CoherentBallisticForwardScrollActivity(
     super.delegate,
-    this.lastEffectiveScrollDirection,
     this.manager,
     Simulation simulation,
     TickerProvider vsync,
@@ -25,7 +23,7 @@ class CoherentFallDownBallisticScrollActivity extends ScrollActivity {
   ) {
     _controller = AnimationController.unbounded(
       debugLabel: kDebugMode
-          ? objectRuntimeType(this, 'CoherentFallDownBallisticScrollActivity')
+          ? objectRuntimeType(this, 'CoherentBallisticForwardScrollActivity')
           : null,
       vsync: vsync,
     )
@@ -43,7 +41,7 @@ class CoherentFallDownBallisticScrollActivity extends ScrollActivity {
 
   @override
   void applyNewDimensions() {
-    delegate.goBallistic(velocity);
+    // delegate.goBallistic(velocity);
   }
 
   void _tick() {
@@ -59,14 +57,15 @@ class CoherentFallDownBallisticScrollActivity extends ScrollActivity {
   CoherentSliverCompat get layerSliverCompat =>
       (delegate as CoherentSliverCompatScrollPosition).sliverCompat;
 
+  /// 这东西返回的结果是是否在当前组件上滚动完成
   @protected
   bool applyMoveTo(double value) {
-    double overscroll = delegate.setPixels(value);
-    // print(
-    //     "(FlutterSourceCode)[coherent_sliver_fall_down_ballistic_scroll_activity.dart]->applyMoveTo animation producer:${value}");
-    // print(
-    //     "(FlutterSourceCode)[coherent_sliver_fall_down_ballistic_scroll_activity.dart]->applyMoveTo overscroll:${overscroll}");
-    return overscroll.abs() > precisionErrorTolerance;
+    var overscroll = delegate.setPixels(value);
+    print(
+        "(FlutterSourceCode)[coherent_sliver_ballistic_forward_scroll_activity.dart]->applyMoveTo animation producer:${value}");
+    print(
+        "(FlutterSourceCode)[coherent_sliver_ballistic_forward_scroll_activity.dart]->applyMoveTo overscroll:${overscroll}!(pixels:${(delegate as ScrollPosition).pixels},scrollExtent:${(delegate as ScrollPosition).minScrollExtent},${(delegate as ScrollPosition).maxScrollExtent})");
+    return overscroll.abs() < precisionErrorTolerance;
   }
 
   void _end() {

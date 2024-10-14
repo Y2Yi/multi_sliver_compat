@@ -4,8 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:free_scroll_compat/coherent_multi_sliver_compat/ballistic/coherent_sliver_ballistic_forward_scroll_activity.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/ballistic/coherent_sliver_ballistic_scroll_activity.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/ballistic/coherent_sliver_fall_down_ballistic_scroll_activity.dart';
+import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_ballistic_simulation.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_delegate_widget.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_scroll_controller.dart';
 
@@ -202,12 +204,7 @@ class CoherentSliverCompat {
     return;
   }
 
-  void ballisticTransformForward(
-      double value, double delta, Simulation simulation) {
-    if (delta == 0) {
-      return;
-    }
-    position.goIdle();
+  void ballisticTransformForward(Simulation simulation) {
     CoherentFallDownScrollActivityManager manager =
         CoherentFallDownScrollActivityManager(
             ScrollDirection.forward, simulation);
@@ -217,22 +214,25 @@ class CoherentSliverCompat {
   void onBallisticTransformForward(
       CoherentFallDownScrollActivityManager manager) {
     // 需要在这个方向上滚动
-    manager.addScrollActivityDelegate(position);
+    if (position.canScrollForward) {
+      manager.addScrollActivityDelegate(position);
+      print(
+          "(FlutterSourceCode)[coherent_sliver_compat.dart]->($effectiveDebugKey) marked!"
+          "(available extent:${position.maxScrollExtent - position.pixels})");
+    } else {
+      print(
+          "(FlutterSourceCode)[coherent_sliver_compat.dart]->($effectiveDebugKey) cant be marked"
+          ".(position maxExtent:${position.maxScrollExtent},pixels:${position.pixels})");
+    }
     CoherentSliverCompat? lastLayer =
         CoherentSliverCompatDelegate.of(buildContext);
+    // 已经是最高层了
     if (lastLayer == null) {
-      // 已经是最高层了
       print(
           "(FlutterSourceCode)[coherent_sliver_compat.dart]->(${effectiveDebugKey} fall down)");
       manager.startFallDown();
     } else {
-      // 继续标记
-      print(
-          "(FlutterSourceCode)[coherent_sliver_compat.dart]->($effectiveDebugKey mark)");
-      // 如果轴上可以滚动要加个判断
-      if (position.canScrollForward) {
-        lastLayer.onBallisticTransformForward(manager);
-      }
+      lastLayer.onBallisticTransformForward(manager);
     }
   }
 }
@@ -241,7 +241,7 @@ class CoherentSliverCompat {
 /// 持有路径节点中会消费弹性滚动事件的所有节点的ScrollActivityDelegate，也就是ScrollPosition
 class CoherentFallDownScrollActivityManager {
   final Queue<ScrollActivityDelegate> _list = Queue();
-  late CoherentFallDownBallisticScrollActivity _activity;
+  CoherentBallisticForwardScrollActivity? _activity;
   final ScrollDirection _lastEffectiveScrollDirection;
   final Simulation _simulation;
 
@@ -274,22 +274,24 @@ class CoherentFallDownScrollActivityManager {
     }
 
     /// 更新下一个Delegate
-    _activity = CoherentFallDownBallisticScrollActivity(
+    _activity = CoherentBallisticForwardScrollActivity(
         head!,
-        _lastEffectiveScrollDirection,
         this,
         _simulation,
         (head as CoherentSliverCompatScrollPosition).context.vsync,
         false // shouldIgnorePointer
         );
+
     print(
-        "(FlutterSourceCode)[coherent_sliver_compat.dart]->CoherentFallDownScrollActivityManager::handleNode - start:${(head as CoherentSliverCompatScrollPosition).sliverCompat.effectiveDebugKey}");
+        "(FlutterSourceCode)[coherent_sliver_compat.dart]->CoherentFallDownScrollActivityManager::handleNode start handle:${(head as CoherentSliverCompatScrollPosition).sliverCompat.effectiveDebugKey}");
+    (_simulation as CoherentBallisticSimulation)
+        .updatePosition((head as ScrollPosition).pixels);
     (head as CoherentSliverCompatScrollPosition).beginActivity(_activity);
   }
 
   void onNodeCompleteListener(ScrollActivityDelegate completedDelegate) {
     print(
-        "(FlutterSourceCode)[coherent_sliver_compat.dart]->CoherentFallDownScrollActivityManager::handleNode - end:${(head as CoherentSliverCompatScrollPosition).sliverCompat.effectiveDebugKey}");
+        "(FlutterSourceCode)[coherent_sliver_compat.dart]->CoherentFallDownScrollActivityManager::handleNode handle completed!:${(head as CoherentSliverCompatScrollPosition).sliverCompat.effectiveDebugKey}");
     removeScrollActivityDelegate(completedDelegate);
     handleCurrentNode();
   }
