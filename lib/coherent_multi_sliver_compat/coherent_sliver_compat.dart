@@ -5,8 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/ballistic/coherent_sliver_ballistic_forward_scroll_activity.dart';
-import 'package:free_scroll_compat/coherent_multi_sliver_compat/ballistic/coherent_sliver_ballistic_scroll_activity.dart';
-import 'package:free_scroll_compat/coherent_multi_sliver_compat/ballistic/coherent_sliver_fall_down_ballistic_scroll_activity.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_ballistic_simulation.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_delegate_widget.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_scroll_controller.dart';
