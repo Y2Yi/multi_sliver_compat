@@ -244,6 +244,8 @@ class CoherentFallDownScrollActivityManager {
   CoherentBallisticForwardScrollActivity? _activity;
   final ScrollDirection _lastEffectiveScrollDirection;
   final Simulation _simulation;
+  double _consumed = 0;
+  double currentNodeStart = 0;
 
   CoherentFallDownScrollActivityManager(
       this._lastEffectiveScrollDirection, this._simulation);
@@ -286,13 +288,17 @@ class CoherentFallDownScrollActivityManager {
         "(FlutterSourceCode)[coherent_sliver_compat.dart]->CoherentFallDownScrollActivityManager::handleNode start handle:${(head as CoherentSliverCompatScrollPosition).sliverCompat.effectiveDebugKey}");
     (_simulation as CoherentBallisticSimulation)
         .updatePosition((head as ScrollPosition).pixels);
+    (_simulation as CoherentBallisticSimulation).updateExtraConsumed(_consumed);
     (head as CoherentSliverCompatScrollPosition).beginActivity(_activity);
+    currentNodeStart = (head as CoherentSliverCompatScrollPosition).pixels;
   }
 
   void onNodeCompleteListener(ScrollActivityDelegate completedDelegate) {
     print(
         "(FlutterSourceCode)[coherent_sliver_compat.dart]->CoherentFallDownScrollActivityManager::handleNode handle completed!:${(head as CoherentSliverCompatScrollPosition).sliverCompat.effectiveDebugKey}");
     removeScrollActivityDelegate(completedDelegate);
+    _consumed +=
+        (completedDelegate as CoherentSliverCompatScrollPosition).pixels - currentNodeStart;
     handleCurrentNode();
   }
 }

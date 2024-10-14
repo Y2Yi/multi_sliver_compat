@@ -7,6 +7,8 @@ import 'package:free_scroll_compat/coherent_multi_sliver_compat/ballistic/cohere
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_compat.dart';
 
 class CoherentBallisticSimulation extends Simulation {
+  double _consumed = 0;
+
   /// Creates a scroll physics simulation that aligns with Android scrolling.
   CoherentBallisticSimulation({
     required this.position,
@@ -94,7 +96,9 @@ class CoherentBallisticSimulation extends Simulation {
   @override
   double x(double time) {
     final double t = clampDouble(time / _duration, 0.0, 1.0);
-    return position + _distance * (1.0 - pow(1.0 - t, _kDecelerationRate));
+    return position +
+        _distance * (1.0 - pow(1.0 - t, _kDecelerationRate)) +
+        _consumed;
   }
 
   @override
@@ -110,5 +114,9 @@ class CoherentBallisticSimulation extends Simulation {
 
   updatePosition(double newPosition) {
     position = newPosition;
+  }
+
+  void updateExtraConsumed(double consumed) {
+    _consumed = consumed;
   }
 }
