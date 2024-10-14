@@ -6,6 +6,7 @@ import 'package:free_scroll_compat/sliver_persistent_header_delegate.dart';
 
 import 'coherent_multi_sliver_compat/coherent_sliver_compat.dart';
 import 'fragments.dart';
+import 'whole_page_demo.dart';
 
 void main() {
   runApp(const MyApp());
@@ -36,7 +37,7 @@ class _SliverCompatBizWidgetState extends State<SliverCompatBizWidget>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
   }
 
   @override
@@ -86,6 +87,7 @@ class _SliverCompatBizWidgetState extends State<SliverCompatBizWidget>
                     _generateGoodsPage(),
                     _generateRatingPage(),
                     _generateStorePage(),
+                    _generateWholePage(),
                   ],
                 ),
               )
@@ -110,6 +112,9 @@ class _SliverCompatBizWidgetState extends State<SliverCompatBizWidget>
       const Tab(
         text: "NestedScrollView",
       ),
+      const Tab(
+        text: "全屏Demo",
+      )
     ];
   }
 
@@ -136,4 +141,15 @@ class _SliverCompatBizWidgetState extends State<SliverCompatBizWidget>
   _generateStorePage() => NestedScrollFragment();
 
   _generateBallisticPage() => BallisticFragment();
+
+  _generateWholePage() => Center(
+        child: TextButton(
+          onPressed: () {
+            Navigator.of(context).push(MaterialPageRoute(builder: (ctx) {
+              return WholePageDemo();
+            }));
+          },
+          child: Text("Whole Page Demo"),
+        ),
+      );
 }

@@ -258,7 +258,7 @@ class _RatingFragmentState extends State<RatingFragment> {
                                   children: [
                                     const FittedBox(
                                       child: SizedBox(
-                                        height: 320,
+                                        height: 640,
                                         child: Text("CommonView"),
                                       ),
                                     ),
