@@ -54,7 +54,7 @@ class CoherentBallisticReverseScrollActivity extends ScrollActivity {
     if (overscroll.abs() >= precisionErrorTolerance) {
       delegate.goIdle();
       // passToParent
-      sliverCompat.beginActivityToParent(overscroll, simulation: _simulation);
+      sliverCompat.beginActivityToParent(simulation: _simulation);
     }
   }
 

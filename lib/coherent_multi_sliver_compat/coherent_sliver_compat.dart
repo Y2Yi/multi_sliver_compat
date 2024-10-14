@@ -170,8 +170,7 @@ class CoherentSliverCompat {
   //   return remaining;
   // }
 
-  void beginActivityToParent(double overscroll,
-      {required Simulation simulation}) {
+  void beginActivityToParent({required Simulation simulation}) {
     ScrollPosition? position = CoherentSliverCompatDelegate.of(buildContext)
         ?.scrollController
         .position;
@@ -179,28 +178,28 @@ class CoherentSliverCompat {
       return;
     }
     (position as CoherentSliverCompatScrollPosition)
-        .acceptBallisticValueWithAnimationController(overscroll, simulation);
+        .acceptBallisticValueWithAnimationController(simulation);
   }
 
   CoherentSliverCompatScrollPosition get position =>
       scrollController.position as CoherentSliverCompatScrollPosition;
 
-  /// reverse direction
-  ballisticTransformReverse(double value, double delta, Simulation simulation) {
-    double overscroll = position.setPixels(value);
-
-    /// overscroll == 0
-    if (overscroll.abs() < precisionErrorTolerance) {
-      return;
-    }
-
-    if (delta.abs() > precisionErrorTolerance) {
-      // 自身需要立即停止动画
-      position.goIdle();
-      beginActivityToParent(overscroll, simulation: simulation);
-    }
-    return;
-  }
+  // /// reverse direction
+  // ballisticTransformReverse(double value, double delta, Simulation simulation) {
+  //   double overscroll = position.setPixels(value);
+  //
+  //   /// overscroll == 0
+  //   if (overscroll.abs() < precisionErrorTolerance) {
+  //     return;
+  //   }
+  //
+  //   if (delta.abs() > precisionErrorTolerance) {
+  //     // 自身需要立即停止动画
+  //     position.goIdle();
+  //     beginActivityToParent(simulation: simulation);
+  //   }
+  //   return;
+  // }
 
   void ballisticTransformForward(Simulation simulation) {
     CoherentFallDownScrollActivityManager manager =
@@ -296,7 +295,8 @@ class CoherentFallDownScrollActivityManager {
         "(FlutterSourceCode)[coherent_sliver_compat.dart]->CoherentFallDownScrollActivityManager::handleNode handle completed!:${(head as CoherentSliverCompatScrollPosition).sliverCompat.effectiveDebugKey}");
     removeScrollActivityDelegate(completedDelegate);
     _consumed +=
-        (completedDelegate as CoherentSliverCompatScrollPosition).pixels - currentNodeStart;
+        (completedDelegate as CoherentSliverCompatScrollPosition).pixels -
+            currentNodeStart;
     handleCurrentNode();
   }
 }

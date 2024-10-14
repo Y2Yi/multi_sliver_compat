@@ -72,7 +72,14 @@ class CoherentSliverCompatScrollPosition
       goIdle();
       sliverCompat.ballisticTransformForward(simulation);
     } else {
-      // reverse
+      if (!canScrollReverse) {
+        /// 跳过，向上传递
+        goIdle();
+        sliverCompat.beginActivityToParent(simulation: simulation);
+        return;
+      }
+
+      /// 当前层消费
       beginActivity(CoherentBallisticReverseScrollActivity(
           this,
           sliverCompat,
@@ -83,8 +90,14 @@ class CoherentSliverCompatScrollPosition
     }
   }
 
-  void acceptBallisticValueWithAnimationController(
-      double overscroll, Simulation simulation) {
+  @override
+  void beginActivity(ScrollActivity? newActivity) {
+    print(
+        "(FlutterSourceCode)[coherent_sliver_position.dart]->(${sliverCompat.effectiveDebugKey})beginActivity:${newActivity.runtimeType}");
+    super.beginActivity(newActivity);
+  }
+
+  void acceptBallisticValueWithAnimationController(Simulation simulation) {
     (simulation as CoherentBallisticSimulation).updatePosition(pixels);
     beginActivity(CoherentBallisticReverseScrollActivity(
         this,
