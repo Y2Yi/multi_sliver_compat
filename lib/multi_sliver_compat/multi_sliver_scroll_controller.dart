@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:free_scroll_compat/multi_sliver_compat/sliver_compat.dart';
 import 'dart:math';
 
+import '../coherent_multi_sliver_compat/tt.dart';
+
 class MultiSliverCompatScrollController extends ScrollController {
   Key? debugKey;
   SliverCompat sliverCompat;
@@ -45,7 +47,7 @@ class MultiSliverCompatScrollPosition extends ScrollPositionWithSingleContext {
   /// 所有的偏移量统一交给SliverCompat去处理；
   @override
   void applyUserOffset(double delta) {
-    print("$debugKey notifyScroll");
+    TT.t("$debugKey notifyScroll");
     sliverCompat.submitUserOffset(this, delta);
   }
 

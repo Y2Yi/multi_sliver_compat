@@ -6,6 +6,7 @@ import 'package:flutter/rendering.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/ballistic/coherent_sliver_ballistic_reverse_scroll_activity.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_ballistic_simulation.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_compat.dart';
+import 'package:free_scroll_compat/coherent_multi_sliver_compat/tt.dart';
 
 class CoherentSliverCompatScrollPosition
     extends ScrollPositionWithSingleContext {
@@ -92,7 +93,7 @@ class CoherentSliverCompatScrollPosition
 
   @override
   void beginActivity(ScrollActivity? newActivity) {
-    print(
+    TT.t(
         "(FlutterSourceCode)[coherent_sliver_position.dart]->(${sliverCompat.effectiveDebugKey})beginActivity:${newActivity.runtimeType}");
     super.beginActivity(newActivity);
   }

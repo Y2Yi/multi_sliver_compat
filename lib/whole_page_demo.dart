@@ -8,6 +8,7 @@ import 'package:free_scroll_compat/multi_sliver_compat/sliver_compat.dart';
 import 'package:free_scroll_compat/sliver_persistent_header_delegate.dart';
 
 import 'coherent_multi_sliver_compat/coherent_sliver_compat.dart';
+import 'coherent_multi_sliver_compat/tt.dart';
 import 'fragments.dart';
 
 class WholePageDemo extends StatefulWidget {
@@ -45,7 +46,7 @@ class _WholePageDemoState extends State<WholePageDemo>
                       ),
                       builder: (Widget child, BuildContext context,
                           double shrinkOffset, bool overlapsContent) {
-                        print(
+                        TT.t(
                             "(FlutterSourceCode)[whole_page_demo.dart]->shrinkOffset:$shrinkOffset");
                         return Stack(
                           children: [
@@ -70,7 +71,10 @@ class _WholePageDemoState extends State<WholePageDemo>
                       minExtent: 50,
                       child: Column(
                         children: [
-                          Divider(thickness: 1,height: 1,),
+                          Divider(
+                            thickness: 1,
+                            height: 1,
+                          ),
                           ColoredBox(
                             color: Color(0xAAFFFFFF),
                             child: TabBar(
@@ -80,12 +84,15 @@ class _WholePageDemoState extends State<WholePageDemo>
                               labelColor: Colors.blue,
                             ),
                           ),
-                          Divider(thickness: 1,height: 1,),
+                          Divider(
+                            thickness: 1,
+                            height: 1,
+                          ),
                         ],
                       )),
                 ),
                 SliverFillRemaining(
-                  child:TabBarView(
+                  child: TabBarView(
                     controller: _tabController,
                     children: [
                       _buildListPart(),
@@ -102,30 +109,24 @@ class _WholePageDemoState extends State<WholePageDemo>
     );
   }
 
-  Widget _buildListPart()=>Row(
-    children: [
-      Expanded(
-          flex: 1,
-          child: CoherentSliverCompatWidget(
-                  (context, sliverCompat) {
+  Widget _buildListPart() => Row(
+        children: [
+          Expanded(
+              flex: 1,
+              child: CoherentSliverCompatWidget((context, sliverCompat) {
                 return buildMenuList(
-                    sliverCompat.generateScrollController(
-                        tag: Key("1-1")),
-                    64,
+                    sliverCompat.generateScrollController(tag: Key("1-1")), 64,
                     count: 18);
               })),
-      Expanded(
-          flex: 4,
-          child: CoherentSliverCompatWidget(
-                  (context, sliverCompat) {
+          Expanded(
+              flex: 4,
+              child: CoherentSliverCompatWidget((context, sliverCompat) {
                 return buildMenuList(
-                    sliverCompat.generateScrollController(
-                        tag: Key("1-2")),
-                    128,
+                    sliverCompat.generateScrollController(tag: Key("1-2")), 128,
                     count: 128);
               })),
-    ],
-  );
+        ],
+      );
 
   List<Tab> _implementTabs() {
     return [

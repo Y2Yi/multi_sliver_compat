@@ -5,6 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:free_scroll_compat/multi_sliver_compat/multi_sliver_scroll_controller.dart';
 
+import '../coherent_multi_sliver_compat/tt.dart';
+
 typedef SliverCompatBuilder = Function(BuildContext, SliverCompat);
 
 class MultiSliverCompatWidget extends StatefulWidget {
@@ -99,16 +101,16 @@ class SliverCompat {
         return 0;
       }
     }
-    print('($debugKey)ToTop 组件间剩余:$remaining');
+    TT.t('($debugKey)ToTop 组件间剩余:$remaining');
 
     /// 内部消化
     remaining = _majorScrollPosition.applyClampedDragUpdate(remaining);
-    print('($debugKey)ToTop major消耗剩余:$remaining');
+    TT.t('($debugKey)ToTop major消耗剩余:$remaining');
     if (remaining == 0) {
       return 0;
     }
     remaining = submitter?.applyClampedDragUpdate(remaining) ?? remaining;
-    print('($debugKey)ToTop minor消耗剩余:$remaining,submitter:$submitter');
+    TT.t('($debugKey)ToTop minor消耗剩余:$remaining,submitter:$submitter');
 
     return remaining;
   }
@@ -125,22 +127,22 @@ class SliverCompat {
         return 0;
       }
     }
-    print('($debugKey)ToBottom 组件间剩余:$remaining');
+    TT.t('($debugKey)ToBottom 组件间剩余:$remaining');
 
     /// 内部消化
     remaining = submitter?.applyClampedDragUpdate(remaining) ?? remaining;
-    print('($debugKey)ToBottom major消耗剩余:$remaining');
+    TT.t('($debugKey)ToBottom major消耗剩余:$remaining');
     if (remaining == 0) {
       return 0;
     }
     remaining = _majorScrollPosition.applyClampedDragUpdate(remaining);
-    print('($debugKey)ToBottom minor消耗剩余:$remaining,submitter:$submitter');
+    TT.t('($debugKey)ToBottom minor消耗剩余:$remaining,submitter:$submitter');
 
     return remaining;
   }
 
   double onChildrenSubmit(double delta) {
-    print('($debugKey)Receiver from Another layer 组件间剩余:$delta');
+    TT.t('($debugKey)Receiver from Another layer 组件间剩余:$delta');
     return submitUserOffset(null, delta);
   }
 }

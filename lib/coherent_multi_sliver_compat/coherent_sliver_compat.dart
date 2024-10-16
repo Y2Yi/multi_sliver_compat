@@ -1,14 +1,13 @@
 import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/ballistic/coherent_sliver_ballistic_forward_scroll_activity.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_ballistic_simulation.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_delegate_widget.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_scroll_controller.dart';
-
+import 'package:free_scroll_compat/coherent_multi_sliver_compat/tt.dart';
 import 'coherent_sliver_position.dart';
 
 /// 这个CoherentSliverCompat理应是隔离的，每个层级的每个结点都有个自己的CoherentSliverCompat；
@@ -61,7 +60,7 @@ class CoherentSliverCompat {
       return 0;
     }
 
-    print('($effectiveDebugKey)Reverse  pha1: 剩余:$remaining');
+    TT.t('($effectiveDebugKey)Reverse  pha1: 剩余:$remaining');
 
     // 结点内部消化
     if (_scrollController != null) {
@@ -70,7 +69,7 @@ class CoherentSliverCompat {
               .applyClampedDragUpdate(remaining);
     }
 
-    print('($effectiveDebugKey)Reverse  pha2: 剩余:$remaining');
+    TT.t('($effectiveDebugKey)Reverse  pha2: 剩余:$remaining');
 
     return remaining;
   }
@@ -89,7 +88,7 @@ class CoherentSliverCompat {
           (_scrollController!.position as CoherentSliverCompatScrollPosition)
               .applyClampedDragUpdate(remaining);
     }
-    print('($effectiveDebugKey)Forward pha1: 剩余:$remaining');
+    TT.t('($effectiveDebugKey)Forward pha1: 剩余:$remaining');
 
     if (remaining == 0) {
       return 0;
@@ -99,13 +98,13 @@ class CoherentSliverCompat {
     remaining = CoherentSliverCompatDelegate.of(buildContext)
             ?.onChildrenSubmit(remaining) ?? // 如果这里换成delta就可以实现多级同步滚动
         remaining;
-    print('($effectiveDebugKey)Forward pha2: 剩余:$remaining');
+    TT.t('($effectiveDebugKey)Forward pha2: 剩余:$remaining');
 
     return remaining;
   }
 
   double onChildrenSubmit(double delta) {
-    print('($effectiveDebugKey)Receiver from Another layer 组件间剩余:$delta');
+    TT.t('($effectiveDebugKey)Receiver from Another layer 组件间剩余:$delta');
     return submitUserOffset(null, delta);
   }
 
@@ -213,11 +212,11 @@ class CoherentSliverCompat {
     // 需要在这个方向上滚动
     if (position.canScrollForward) {
       manager.addScrollActivityDelegate(position);
-      print(
+      TT.t(
           "(FlutterSourceCode)[coherent_sliver_compat.dart]->($effectiveDebugKey) marked!"
           "(available extent:${position.maxScrollExtent - position.pixels})");
     } else {
-      print(
+      TT.t(
           "(FlutterSourceCode)[coherent_sliver_compat.dart]->($effectiveDebugKey) cant be marked"
           ".(position maxExtent:${position.maxScrollExtent},pixels:${position.pixels})");
     }
@@ -225,7 +224,7 @@ class CoherentSliverCompat {
         CoherentSliverCompatDelegate.of(buildContext);
     // 已经是最高层了
     if (lastLayer == null) {
-      print(
+      TT.t(
           "(FlutterSourceCode)[coherent_sliver_compat.dart]->(${effectiveDebugKey} fall down)");
       manager.startFallDown();
     } else {
@@ -281,7 +280,7 @@ class CoherentFallDownScrollActivityManager {
         false // shouldIgnorePointer
         );
 
-    print(
+    TT.t(
         "(FlutterSourceCode)[coherent_sliver_compat.dart]->CoherentFallDownScrollActivityManager::handleNode start handle:${(head as CoherentSliverCompatScrollPosition).sliverCompat.effectiveDebugKey}");
     (_simulation as CoherentBallisticSimulation)
         .updatePosition((head as ScrollPosition).pixels);
@@ -291,7 +290,7 @@ class CoherentFallDownScrollActivityManager {
   }
 
   void onNodeCompleteListener(ScrollActivityDelegate completedDelegate) {
-    print(
+    TT.t(
         "(FlutterSourceCode)[coherent_sliver_compat.dart]->CoherentFallDownScrollActivityManager::handleNode handle completed!:${(head as CoherentSliverCompatScrollPosition).sliverCompat.effectiveDebugKey}");
     removeScrollActivityDelegate(completedDelegate);
     _consumed +=

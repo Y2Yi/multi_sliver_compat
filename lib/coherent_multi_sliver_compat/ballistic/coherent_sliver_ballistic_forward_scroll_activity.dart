@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_compat.dart';
 import 'package:free_scroll_compat/coherent_multi_sliver_compat/coherent_sliver_position.dart';
+import 'package:free_scroll_compat/coherent_multi_sliver_compat/tt.dart';
 
 typedef ScrollActivityDelegateListener = Function(
     ScrollActivityDelegate delegate);
@@ -59,9 +60,9 @@ class CoherentBallisticForwardScrollActivity extends ScrollActivity {
   @protected
   bool applyMoveTo(double value) {
     var overscroll = delegate.setPixels(value);
-    print(
+    TT.t(
         "(FlutterSourceCode)[coherent_sliver_ballistic_forward_scroll_activity.dart]->applyMoveTo animation producer:${value}");
-    print(
+    TT.t(
         "(FlutterSourceCode)[coherent_sliver_ballistic_forward_scroll_activity.dart]->applyMoveTo overscroll:${overscroll}!(pixels:${(delegate as ScrollPosition).pixels},scrollExtent:${(delegate as ScrollPosition).minScrollExtent},${(delegate as ScrollPosition).maxScrollExtent})");
     return overscroll.abs() < precisionErrorTolerance;
   }
